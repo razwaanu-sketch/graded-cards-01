@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Pokémon Graded Cards - Premium graded Pokémon card marketplace">
+    <title>Pokémon Graded Cards</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <!-- Logo Section -->
+            <div class="logo">
+                <h1>🃏 Graded Cards 01</h1>
+            </div>
+            
+            <!-- Navigation Links -->
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link active">Home</a></li>
+                <li><a href="#browse" class="nav-link">Browse</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            
+            <!-- Mobile Menu Toggle -->
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Pokémon Graded Cards</h1>
+            <p class="hero-subtitle">Discover & Collect Premium Graded Pokémon Cards</p>
+            <button class="cta-button">Explore Collection</button>
+        </div>
+        <div class="hero-background">
+            <!-- Decorative background element -->
+        </div>
+    </section>
+
+    <!-- Search & Filter Section -->
+    <section class="search-filter">
+        <div class="container">
+            <h2>Find Your Cards</h2>
+            
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search by card name, set, or grade...">
+                <button class="search-btn">🔍 Search</button>
+            </div>
+            
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label for="gradeFilter">Grade:</label>
+                    <select id="gradeFilter">
+                        <option value="">All Grades</option>
+                        <option value="10">PSA 10 - Gem Mint</option>
+                        <option value="9">PSA 9 - Mint</option>
+                        <option value="8">PSA 8 - NM-Mint</option>
+                        <option value="7">PSA 7 - NM</option>
+                        <option value="6">PSA 6 - Excellent-Mint</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="typeFilter">Type:</label>
+                    <select id="typeFilter">
+                        <option value="">All Types</option>
+                        <option value="fire">Fire</option>
+                        <option value="water">Water</option>
+                        <option value="grass">Grass</option>
+                        <option value="electric">Electric</option>
+                        <option value="psychic">Psychic</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="priceFilter">Price Range:</label>
+                    <select id="priceFilter">
+                        <option value="">All Prices</option>
+                        <option value="0-50">Under $50</option>
+                        <option value="50-100">$50 - $100</option>
+                        <option value="100-500">$100 - $500</option>
+                        <option value="500+">$500+</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Cards Section -->
+    <section id="browse" class="featured-cards">
+        <div class="container">
+            <h2>Featured Cards</h2>
+            
+            <div class="cards-grid">
+                <!-- Card 1 -->
+                <div class="card">
+                    <div class="card-image">
+                        <div class="placeholder">Card Image 1</div>
+                    </div>
+                    <div class="card-details">
+                        <h3 class="card-title">Charizard Base Set</h3>
+                        <p class="card-set">Base Set • #4/102</p>
+                        <div class="card-info">
+                            <span class="grade">PSA 9</span>
+                            <span class="price">$2,500</span>
+                        </div>
+                        <button class="view-btn">View Details</button>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="card">
+                    <div class="card-image">
+                        <div class="placeholder">Card Image 2</div>
+                    </div>
+                    <div class="card-details">
+                        <h3 class="card-title">Blastoise Base Set</h3>
+                        <p class="card-set">Base Set • #2/102</p>
+                        <div class="card-info">
+                            <span class="grade">PSA 8</span>
+                            <span class="price">$1,800</span>
+                        </div>
+                        <button class="view-btn">View Details</button>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="card">
+                    <div class="card-image">
+                        <div class="placeholder">Card Image 3</div>
+                    </div>
+                    <div class="card-details">
+                        <h3 class="card-title">Venusaur Base Set</h3>
+                        <p class="card-set">Base Set • #3/102</p>
+                        <div class="card-info">
+                            <span class="grade">PSA 9</span>
+                            <span class="price">$2,200</span>
+                        </div>
+                        <button class="view-btn">View Details</button>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="card">
+                    <div class="card-image">
+                        <div class="placeholder">Card Image 4</div>
+                    </div>
+                    <div class="card-details">
+                        <h3 class="card-title">Dragonite Holo</h3>
+                        <p class="card-set">Base Set • #5/102</p>
+                        <div class="card-info">
+                            <span class="grade">PSA 10</span>
+                            <span class="price">$3,500</span>
+                        </div>
+                        <button class="view-btn">View Details</button>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="card">
+                    <div class="card-image">
+                        <div class="placeholder">Card Image 5</div>
+                    </div>
+                    <div class="card-details">
+                        <h3 class="card-title">Gyarados Holo</h3>
+                        <p class="card-set">Base Set • #6/102</p>
+                        <div class="card-info">
+                            <span class="grade">PSA 8</span>
+                            <span class="price">$1,200</span>
+                        </div>
+                        <button class="view-btn">View Details</button>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="card">
+                    <div class="card-image">
+                        <div class="placeholder">Card Image 6</div>
+                    </div>
+                    <div class="card-details">
+                        <h3 class="card-title">Arcanine Holo</h3>
+                        <p class="card-set">Base Set • #7/102</p>
+                        <div class="card-info">
+                            <span class="grade">PSA 9</span>
+                            <span class="price">$1,600</span>
+                        </div>
+                        <button class="view-btn">View Details</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2>About Graded Cards 01</h2>
+            <div class="about-content">
+                <p>Welcome to Graded Cards 01, your premier destination for authentic, professionally graded Pokémon cards. We specialize in high-quality vintage and modern Pokémon cards, all certified by leading grading companies.</p>
+                <p>Our mission is to provide collectors with access to premium graded cards with complete transparency, authenticity guarantees, and competitive pricing.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2>Get In Touch</h2>
+            <form class="contact-form">
+                <div class="form-group">
+                    <input type="text" placeholder="Your Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" placeholder="Your Email" required>
+                </div>
+                <div class="form-group">
+                    <textarea placeholder="Your Message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Send Message</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>Graded Cards 01</h3>
+                <p>&copy; 2024 Graded Cards 01. All rights reserved.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Follow Us</h4>
+                <div class="social-links">
+                    <a href="#" class="social-link">Facebook</a>
+                    <a href="#" class="social-link">Instagram</a>
+                    <a href="#" class="social-link">Twitter</a>
+                    <a href="#" class="social-link">Discord</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#browse">Browse</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>Privacy Policy • Terms of Service • Shipping Info</p>
+        </div>
+    </footer>
+
+    <!-- Link to JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
