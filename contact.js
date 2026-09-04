@@ -7,6 +7,13 @@
 
   const CONTACT_EMAIL = "your-email@example.com"; // TODO: replace with your real contact email
 
+  // Pre-fill the message from ?prefill= (used by the cart page's "combined invoice" link)
+  const params = new URLSearchParams(window.location.search);
+  const prefill = params.get("prefill");
+  if (prefill && form.elements["message"]) {
+    form.elements["message"].value = prefill;
+  }
+
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     const name = form.elements["name"].value.trim();

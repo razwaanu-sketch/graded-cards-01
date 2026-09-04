@@ -30,17 +30,19 @@
     });
   });
 
-  // Reveal sections
+  // Reveal sections. threshold:0 fires as soon as any part enters view — a
+  // percentage-based threshold can never be met by a section taller than
+  // the viewport (e.g. the shop grid), leaving it permanently invisible.
   const observer = new IntersectionObserver((entries)=>{
     entries.forEach(entry=>{
       if(entry.isIntersecting){ entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }
     });
-  }, {root:null, rootMargin:'0px 0px -80px 0px', threshold: 0.12});
+  }, {root:null, rootMargin:'0px 0px -40px 0px', threshold: 0});
   document.querySelectorAll('.reveal-section').forEach(s => observer.observe(s));
 
   // Hero staggered fade-in
   window.addEventListener('load', ()=>{
-    document.querySelectorAll('.hero-title, .hero-sub, .hero-ctas, .hero-card').forEach((el,i)=>{
+    document.querySelectorAll('.hero-title, .hero-sub, .hero-search-wrap').forEach((el,i)=>{
       el.style.opacity = 0; el.style.transform = 'translateY(8px)';
       setTimeout(()=>{ el.style.transition = 'opacity .8s cubic-bezier(.2,.9,.2,1), transform .8s cubic-bezier(.2,.9,.2,1)'; el.style.opacity = 1; el.style.transform = 'none'; }, 200 + i*140);
     });

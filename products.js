@@ -4,6 +4,7 @@
 // To mark a card sold: set `sold: true`.
 // To add a Stripe "Buy Now" link: see SETUP.md, then paste the URL into `stripeLink`.
 // To add real photos: upload files to images/cards/ using the exact `image` filename below.
+// `tags` controls which category tiles / filter chips a card shows under on the shop page.
 const PRODUCTS = [
   {
     id: "eevee-ex",
@@ -17,7 +18,8 @@ const PRODUCTS = [
     currency: "GBP",
     image: "images/cards/eevee-ex.jpg",
     stripeLink: "",
-    sold: false
+    sold: false,
+    tags: ["eeveelution"]
   },
   {
     id: "flareon-ex",
@@ -31,7 +33,8 @@ const PRODUCTS = [
     currency: "GBP",
     image: "images/cards/flareon-ex.jpg",
     stripeLink: "",
-    sold: false
+    sold: false,
+    tags: ["eeveelution"]
   },
   {
     id: "espeon-ex",
@@ -45,7 +48,8 @@ const PRODUCTS = [
     currency: "GBP",
     image: "images/cards/espeon-ex.jpg",
     stripeLink: "",
-    sold: false
+    sold: false,
+    tags: ["eeveelution"]
   },
   {
     id: "leafeon-ex",
@@ -59,7 +63,8 @@ const PRODUCTS = [
     currency: "GBP",
     image: "images/cards/leafeon-ex.jpg",
     stripeLink: "",
-    sold: false
+    sold: false,
+    tags: ["eeveelution"]
   },
   {
     id: "jolteon-ex",
@@ -73,7 +78,8 @@ const PRODUCTS = [
     currency: "GBP",
     image: "images/cards/jolteon-ex.jpg",
     stripeLink: "",
-    sold: false
+    sold: false,
+    tags: ["eeveelution"]
   },
   {
     id: "mega-gengar-ex",
@@ -87,7 +93,8 @@ const PRODUCTS = [
     currency: "GBP",
     image: "images/cards/mega-gengar-ex.jpg",
     stripeLink: "",
-    sold: false
+    sold: false,
+    tags: ["mega-evolution"]
   },
   {
     id: "mega-venusaur-ex",
@@ -101,7 +108,8 @@ const PRODUCTS = [
     currency: "GBP",
     image: "images/cards/mega-venusaur-ex.jpg",
     stripeLink: "",
-    sold: false
+    sold: false,
+    tags: ["mega-evolution"]
   },
   {
     id: "bulbasaur",
@@ -115,7 +123,8 @@ const PRODUCTS = [
     currency: "GBP",
     image: "images/cards/bulbasaur.jpg",
     stripeLink: "",
-    sold: false
+    sold: false,
+    tags: ["other"]
   },
   {
     id: "articuno",
@@ -129,7 +138,8 @@ const PRODUCTS = [
     currency: "GBP",
     image: "images/cards/articuno.jpg",
     stripeLink: "",
-    sold: false
+    sold: false,
+    tags: ["other"]
   },
   {
     id: "pikachu-ex",
@@ -143,6 +153,16 @@ const PRODUCTS = [
     currency: "GBP",
     image: "images/cards/pikachu-ex.jpg",
     stripeLink: "",
-    sold: false
+    sold: false,
+    tags: ["other"]
   }
+];
+
+// Category tiles shown above the shop grid. `tag` must match a value in each
+// product's `tags` array above (or "" for "all cards").
+const CATEGORIES = [
+  { tag: "", label: "All Cards", sub: "The full collection", image: "images/cards/eevee-ex.jpg" },
+  { tag: "eeveelution", label: "Eeveelutions", sub: "5 cards", image: "images/cards/eevee-ex.jpg" },
+  { tag: "mega-evolution", label: "Mega Evolutions", sub: "2 cards", image: "images/cards/mega-gengar-ex.jpg" },
+  { tag: "other", label: "Other Singles", sub: "3 cards", image: "images/cards/pikachu-ex.jpg" }
 ];
