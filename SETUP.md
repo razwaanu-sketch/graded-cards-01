@@ -6,7 +6,7 @@ you can supply them. Do these in order:
 
 ## 1. Add real card photos
 
-Upload these 5 files to the `images/cards/` folder in this repo (drag-and-drop
+Upload these 10 files to the `images/cards/` folder in this repo (drag-and-drop
 on GitHub.com works fine — go to the folder, click "Add file → Upload files"):
 
 - `images/cards/eevee-ex.jpg`
@@ -14,6 +14,11 @@ on GitHub.com works fine — go to the folder, click "Add file → Upload files"
 - `images/cards/espeon-ex.jpg`
 - `images/cards/leafeon-ex.jpg`
 - `images/cards/jolteon-ex.jpg`
+- `images/cards/mega-gengar-ex.jpg`
+- `images/cards/mega-venusaur-ex.jpg`
+- `images/cards/bulbasaur.jpg`
+- `images/cards/articuno.jpg`
+- `images/cards/pikachu-ex.jpg`
 
 Filenames must match exactly (lowercase, hyphens). Until a file is uploaded,
 that card shows a "Photo coming soon" placeholder automatically — nothing
@@ -43,7 +48,7 @@ Right now every "Buy now" button falls back to "Contact to buy" because
    ```
 6. Commit and push. The "Buy now" button for that card goes live immediately.
 
-Repeat for each of the 5 cards.
+Repeat for each of the 10 cards.
 
 **When a card sells:** Stripe deactivates that link automatically (because of
 the limit-1 setting), but the button on your site won't know that on its own.
