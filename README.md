@@ -1,28 +1,28 @@
 # graded-cards-01
-A modern, responsive website for Pokémon Graded Cards
 
----
+A static storefront for selling PSA graded Pokémon cards, hosted on GitHub
+Pages at [www.gradedcards01.com](https://www.gradedcards01.com).
 
-This branch (premium-redesign) contains a visual and performance-focused redesign: dark luxury theme, gold accents, full-screen hero with PSA 10 card, sticky transparent nav, polished product cards (glass effect), trust badges, accessibility improvements, and performance optimizations (lazy images, deferred JS, reduced motion support).
+## What's here
 
-Testing checklist
+- `index.html` — homepage: hero, shop grid, trust section
+- `products.js` — the product catalog (edit prices, mark items sold, add Stripe links here)
+- `shop.js` — renders the shop grid from `products.js` and handles Buy Now / Sold state
+- `about.html`, `contact.html`, `shipping.html`, `terms.html`, `privacy.html` — supporting pages
+- `contact.js` — powers the contact form (opens a pre-filled email, no backend needed)
+- `style.css`, `script.js` — shared styling and interactions
+- `images/cards/` — card photos (filenames referenced from `products.js`)
 
-1. Checkout the premium-redesign branch:
-   git fetch origin
-   git checkout premium-redesign
+## Getting fully live
 
-2. Open index.html in a static server (VS Code Live Server or python -m http.server) and review on mobile/desktop.
+See **[SETUP.md](SETUP.md)** for the remaining steps: uploading real card
+photos, creating Stripe Payment Links so "Buy now" actually charges buyers,
+and filling in your real business details on the legal/contact pages.
 
-3. Manual tests:
-   - Keyboard navigation (Tab through header, hero CTA, products)
-   - Reduced motion (OS setting)
-   - Mobile menu behavior and touch targets
-   - Contact form submission and validation
+## Local preview
 
-4. Performance:
-   - Check Lighthouse (Mobile & Desktop) and note improvements
+```
+python3 -m http.server
+```
 
-Notes
-
-- Images used are placeholder external URLs; replace them with optimized AVIF/WebP assets in the repo's public/images directory for best performance.
-- I did not change product data or site structure; only presentation and client behavior were updated.
+then open `http://localhost:8000`.
