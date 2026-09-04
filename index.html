@@ -56,25 +56,58 @@
     <section class="hero" aria-labelledby="hero-heading">
       <div class="hero-inner container">
         <div class="hero-copy">
-          <h1 id="hero-heading" class="hero-title">Elite PSA Graded Pokémon Cards</h1>
-          <p class="hero-sub">A curated collection of PSA 10 Japanese graded Pokémon cards — authenticated, graded, and ready to collect.</p>
-          <div class="hero-ctas">
-            <a class="btn-gold cta" href="#shop">Shop Now</a>
-            <a class="btn-ghost" href="contact.html">Contact Us</a>
+          <p class="hero-kicker">UK STOCK · PSA AUTHENTICATED</p>
+          <h1 id="hero-heading" class="hero-title">PSA graded Pokémon cards, hand picked.</h1>
+          <p class="hero-sub">Search the collection by Pokémon, set, or card number — every card shown is graded and ready to ship.</p>
+        </div>
+
+        <div class="hero-search-wrap">
+          <form class="hero-search-form" role="search" aria-label="Search cards">
+            <div class="search-input-row">
+              <input type="search" class="hero-search-input" placeholder="Try Eevee ex, SV8a or 224/187" aria-label="Search cards">
+              <button type="submit" class="btn-gold search-btn">Search</button>
+            </div>
+          </form>
+          <div class="tag-row" aria-label="Popular searches">
+            <span class="tag-row-label">POPULAR</span>
+            <button type="button" class="tag-chip" data-tag="eeveelution">Eeveelutions</button>
+            <button type="button" class="tag-chip" data-tag="mega-evolution">Mega Evolutions</button>
+            <button type="button" class="tag-chip" data-tag="">All cards</button>
           </div>
-          <ul class="trust-inline" aria-hidden="true">
-            <li>100% authentic PSA graded cards</li>
-            <li>Secure checkout</li>
-            <li>Fast UK shipping</li>
-          </ul>
+          <div class="hero-links">
+            <a href="#shop">Browse all cards →</a>
+            <a href="cart.html">View cart →</a>
+          </div>
+          <p class="hero-trust-line">PSA authenticated · Secure Stripe checkout · Fast UK dispatch</p>
         </div>
       </div>
       <div class="hero-decor" aria-hidden="true"></div>
     </section>
 
+    <section class="section container reveal-section" aria-labelledby="categories-heading">
+      <h2 id="categories-heading" class="sr-only">Shop by category</h2>
+      <div class="category-tiles" id="category-tiles">
+        <!-- Rendered from products.js (CATEGORIES) by shop.js -->
+      </div>
+    </section>
+
     <section id="shop" class="section container reveal-section" aria-labelledby="shop-heading">
       <h2 id="shop-heading" class="section-title">The Collection</h2>
       <p class="lede">PSA 10 Gem Mint Japanese cards, hand-picked from recent Pokémon sets — each a genuine 1-of-1 in this listing.</p>
+
+      <div class="shop-toolbar">
+        <form class="shop-search-form" role="search" aria-label="Search the collection">
+          <input type="search" class="shop-search-input" placeholder="Search by name, set, or card number" aria-label="Search cards">
+          <button type="submit" class="btn-outline">Search</button>
+        </form>
+        <div class="tag-row shop-filter-row" aria-label="Filter by category">
+          <button type="button" class="tag-chip shop-filter-btn active" data-tag="">All</button>
+          <button type="button" class="tag-chip shop-filter-btn" data-tag="eeveelution">Eeveelutions</button>
+          <button type="button" class="tag-chip shop-filter-btn" data-tag="mega-evolution">Mega Evolutions</button>
+          <button type="button" class="tag-chip shop-filter-btn" data-tag="other">Other</button>
+        </div>
+        <p class="shop-count" id="shop-count" aria-live="polite"></p>
+      </div>
 
       <div class="product-grid" id="shop-grid" role="list">
         <!-- Rendered from products.js by shop.js -->
@@ -129,6 +162,7 @@
   </main>
 
   <script src="products.js" defer></script>
+  <script src="cart.js" defer></script>
   <script src="shop.js" defer></script>
   <script src="script.js" defer></script>
 </body>
