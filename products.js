@@ -17,7 +17,7 @@ const PRODUCTS = [
     price: 300,
     currency: "GBP",
     image: "images/cards/eevee-ex.jpg",
-    stripeLink: "https://buy.stripe.com/eVq14ngMH2lf7Ur7GP0oM00",
+    stripeLink: "https://buy.stripe.com/fZucN52VR7FzeiP6CL0oM01",
     sold: false,
     tags: ["eeveelution"]
   },
