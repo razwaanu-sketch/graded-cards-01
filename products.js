@@ -149,7 +149,7 @@ const PRODUCTS = [
     grade: "PSA 10",
     gradeLabel: "GEM MT",
     certNumber: "101087792",
-    price: 300,
+    price: 1000,
     currency: "GBP",
     image: "images/cards/pikachu-ex.jpg",
     stripeLink: "",
