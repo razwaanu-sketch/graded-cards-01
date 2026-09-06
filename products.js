@@ -1,4 +1,4 @@
-// Product catalog for Elite PSA Graded Pokémon Cards.
+// Product catalog for Graded Cards 01.
 //
 // To edit prices: change the `price` number below and push.
 // To mark a card sold: set `sold: true`.
