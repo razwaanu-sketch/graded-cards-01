@@ -47,7 +47,7 @@ const PRODUCTS = [
     price: 300,
     currency: "GBP",
     image: "images/cards/espeon-ex.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/dRm28rbsn8JDa2z9OX0oM03",
     sold: false,
     tags: ["eeveelution"]
   },
@@ -62,7 +62,7 @@ const PRODUCTS = [
     price: 300,
     currency: "GBP",
     image: "images/cards/leafeon-ex.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/aFa9ATeEzf81fmT9OX0oM04",
     sold: false,
     tags: ["eeveelution"]
   },
@@ -77,7 +77,7 @@ const PRODUCTS = [
     price: 300,
     currency: "GBP",
     image: "images/cards/jolteon-ex.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/6oUeVdcwr4tn7Ur0en0oM05",
     sold: false,
     tags: ["eeveelution"]
   },
@@ -92,7 +92,7 @@ const PRODUCTS = [
     price: 900,
     currency: "GBP",
     image: "images/cards/mega-gengar-ex.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/cNi7sLgMH1hb4Iff9h0oM06",
     sold: false,
     tags: ["mega-evolution"]
   },
@@ -107,7 +107,7 @@ const PRODUCTS = [
     price: 300,
     currency: "GBP",
     image: "images/cards/mega-venusaur-ex.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/9B67sL2VR6BveiP0en0oM07",
     sold: false,
     tags: ["mega-evolution"]
   },
@@ -122,7 +122,7 @@ const PRODUCTS = [
     price: 300,
     currency: "GBP",
     image: "images/cards/bulbasaur.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/7sYdR9cwr1hb1w3d190oM08",
     sold: false,
     tags: ["other"]
   },
@@ -137,7 +137,7 @@ const PRODUCTS = [
     price: 300,
     currency: "GBP",
     image: "images/cards/articuno.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/3cI00j6837FzgqXe5d0oM0a",
     sold: false,
     tags: ["other"]
   },
@@ -152,7 +152,7 @@ const PRODUCTS = [
     price: 1000,
     currency: "GBP",
     image: "images/cards/pikachu-ex.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/5kQeVdcwr8JD2A75yH0oM0b",
     sold: false,
     tags: ["other"]
   }
