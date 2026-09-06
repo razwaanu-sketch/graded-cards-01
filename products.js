@@ -32,7 +32,7 @@ const PRODUCTS = [
     price: 300,
     currency: "GBP",
     image: "images/cards/flareon-ex.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/3cI14n683cZT7Ure5d0oM02",
     sold: false,
     tags: ["eeveelution"]
   },
