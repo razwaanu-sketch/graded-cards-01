@@ -4,8 +4,8 @@
   --card-bg: rgba(255,255,255,0.035);
   --glass: rgba(255,255,255,0.045);
   --muted: #b7bcc2;
-  --gold:#ef2743;
-  --gold-2:#ff4d64;
+  --gold:#D4AF37;
+  --gold-2:#e0c158;
   --accent: linear-gradient(90deg,var(--gold),var(--gold-2));
   --radius:14px;
   --glass-blur:10px;
@@ -113,7 +113,7 @@ body{
   flex:1;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.12);border-radius:10px;
   padding:.75rem .9rem;color:#eef0f2;font:inherit;
 }
-.hero-search-input:focus, .shop-search-input:focus{outline:2px solid rgba(239,39,67,0.45)}
+.hero-search-input:focus, .shop-search-input:focus{outline:2px solid rgba(212,175,55,0.45)}
 .search-btn{white-space:nowrap}
 .tag-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
 .tag-row-label{color:var(--muted);font-size:.7rem;font-weight:700;letter-spacing:.06em;margin-right:2px}
@@ -157,7 +157,7 @@ body{
 .price{font-weight:700;color:var(--gold)}
 .btn-disabled{opacity:.5;cursor:not-allowed;pointer-events:none}
 .cart-toggle{cursor:pointer;font:inherit}
-.cart-toggle.in-cart{color:var(--gold);border-color:rgba(239,39,67,0.4)}
+.cart-toggle.in-cart{color:var(--gold);border-color:rgba(212,175,55,0.4)}
 
 /* Category tiles */
 .category-tiles{display:grid;grid-template-columns:1fr;gap:1px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden}
