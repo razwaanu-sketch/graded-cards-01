@@ -190,6 +190,8 @@ body{
 .prose h2:first-child{margin-top:0}
 .prose p, .prose li{color:var(--muted);line-height:1.7}
 .prose a{color:var(--gold)}
+.prose .btn-gold{color:#081018}
+.prose .btn-outline, .prose .btn-ghost{color:var(--muted)}
 .placeholder{color:#e7b8b8;background:rgba(200,60,60,0.08);border:1px dashed rgba(200,60,60,0.4);padding:.05rem .4rem;border-radius:6px;font-size:.92em}
 
 /* Contact form */
