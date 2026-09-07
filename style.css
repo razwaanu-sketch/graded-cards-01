@@ -103,7 +103,7 @@ body{
 .hero-inner{display:flex;flex-direction:column;gap:32px;align-items:stretch;justify-content:space-between}
 .hero-copy{text-align:left}
 .hero-kicker{color:var(--gold);font-weight:700;font-size:.78rem;letter-spacing:.08em;margin:0 0 .6rem}
-.hero-title{font-family:"Space Grotesk",Inter;font-weight:800;font-size:2.1rem;line-height:1.08;margin:.2rem 0;color:#fff;letter-spacing:-0.02em}
+.hero-title{font-family:"Space Grotesk",Inter;font-weight:700;font-size:2.1rem;line-height:1.08;margin:.2rem 0;color:#fff;letter-spacing:-0.02em}
 .hero-sub{color:var(--muted);margin:.8rem 0 0;max-width:46ch}
 
 /* Hero search block */
@@ -145,6 +145,7 @@ body{
   overflow:hidden;
 }
 .product-media{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:3/4;background:#0c0d0e}
+.product-media picture{display:block;width:100%;height:100%}
 .product-media img{width:100%;height:100%;display:block;object-fit:cover}
 .quick-view{position:absolute;right:10px;top:10px;background:rgba(0,0,0,0.45);color:#fff;border:0;padding:.45rem .6rem;border-radius:8px;backdrop-filter: blur(6px)}
 .grade-badge{position:absolute;left:10px;top:10px;background:rgba(0,0,0,0.6);color:var(--gold);border:1px solid rgba(212,175,55,0.4);font-size:.72rem;font-weight:700;letter-spacing:.02em;padding:.3rem .55rem;border-radius:999px;backdrop-filter: blur(6px)}
@@ -168,6 +169,7 @@ body{
 .category-tile:hover, .category-tile:focus{background:rgba(255,255,255,0.04)}
 .category-tile-num{color:var(--muted);font-size:.78rem;font-weight:700;flex:0 0 auto}
 .category-tile-thumb{width:44px;height:58px;border-radius:6px;overflow:hidden;flex:0 0 auto;background:#111}
+.category-tile-thumb picture{display:block;width:100%;height:100%}
 .category-tile-thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .category-tile-text{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
 .category-tile-label{font-weight:700}
@@ -210,6 +212,7 @@ body{
 .cart-list{display:flex;flex-direction:column;gap:14px}
 .cart-row{display:flex;flex-wrap:wrap;gap:12px 14px;align-items:flex-start;background:var(--card-bg);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:12px}
 .cart-row-thumb{width:60px;height:80px;border-radius:8px;overflow:hidden;flex:0 0 auto;background:#111}
+.cart-row-thumb picture{display:block;width:100%;height:100%}
 .cart-row-thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .cart-row-info{flex:1 1 180px;min-width:0}
 .cart-row-title{margin:0;font-weight:700;color:#eef0f2}

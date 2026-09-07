@@ -64,15 +64,18 @@
 
     const media = document.createElement("div");
     media.className = "product-media";
-
-    const img = document.createElement("img");
-    img.src = product.image;
-    img.alt = `${product.name} — ${product.grade} graded Pokémon card, front view`;
-    img.loading = "lazy";
+    // Built as one innerHTML assignment (not createElement/appendChild) so the
+    // browser's <picture> source-selection sees the <source> before the <img>
+    // starts loading — appending an already-src'd <img> into <picture> after
+    // the fact causes some browsers to fetch both the source and the img src.
+    media.innerHTML = `<picture>
+      <source srcset="${product.image.replace(/\.jpg$/, ".webp")}" type="image/webp">
+      <img src="${product.image}" alt="${product.name} — ${product.grade} graded Pokémon card, front view" loading="lazy">
+    </picture>`;
+    const img = media.querySelector("img");
     img.addEventListener("error", () => {
       img.src = "images/cards/placeholder.svg";
     });
-    media.appendChild(img);
 
     const gradeBadge = document.createElement("span");
     gradeBadge.className = "grade-badge";
@@ -168,7 +171,7 @@
       btn.setAttribute("data-tag", cat.tag);
       btn.innerHTML = `
         <span class="category-tile-num">${String(i + 1).padStart(2, "0")}</span>
-        <span class="category-tile-thumb"><img src="${cat.image}" alt="" loading="lazy"></span>
+        <span class="category-tile-thumb"><picture><source srcset="${cat.image.replace(/\.jpg$/, ".webp")}" type="image/webp"><img src="${cat.image}" alt="" loading="lazy"></picture></span>
         <span class="category-tile-text">
           <span class="category-tile-label">${cat.label}</span>
           <span class="category-tile-sub">${cat.sub}</span>

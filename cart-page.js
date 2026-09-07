@@ -37,14 +37,16 @@
 
       const thumb = document.createElement("div");
       thumb.className = "cart-row-thumb";
-      const img = document.createElement("img");
-      img.src = product.image;
-      img.alt = `${product.name} — ${product.grade}`;
-      img.loading = "lazy";
+      // See shop.js for why this is one innerHTML assignment rather than
+      // createElement/appendChild (avoids double-fetching source + img src).
+      thumb.innerHTML = `<picture>
+        <source srcset="${product.image.replace(/\.jpg$/, ".webp")}" type="image/webp">
+        <img src="${product.image}" alt="${product.name} — ${product.grade}" loading="lazy">
+      </picture>`;
+      const img = thumb.querySelector("img");
       img.addEventListener("error", () => {
         img.src = "images/cards/placeholder.svg";
       });
-      thumb.appendChild(img);
 
       const info = document.createElement("div");
       info.className = "cart-row-info";
