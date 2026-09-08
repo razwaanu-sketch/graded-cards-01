@@ -3,7 +3,7 @@
   // Set this to your deployed Cloudflare Worker URL (see checkout-worker/worker.js
   // and SETUP.md) to enable a single combined Stripe checkout for the whole cart.
   // Left blank, the page falls back to the existing "request a combined invoice" flow.
-  const CHECKOUT_ENDPOINT = "";
+  const CHECKOUT_ENDPOINT = "https://graded-cards-01.gradedcards01.workers.dev";
 
   const listEl = document.getElementById("cart-list");
   const emptyEl = document.getElementById("cart-empty");
