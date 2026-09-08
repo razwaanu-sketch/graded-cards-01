@@ -221,6 +221,7 @@ body{
 .prose .btn-gold{color:var(--gold-ink)}
 .prose .btn-outline, .prose .btn-ghost{color:var(--ink)}
 .placeholder{color:#e7b8b8;background:rgba(200,60,60,0.08);border:1px dashed rgba(200,60,60,0.4);padding:.05rem .4rem;border-radius:0;font-size:.92em}
+.return-address{font-family:var(--mono);font-size:.86rem;color:var(--ink);border-left:2px solid var(--gold);padding:.2rem 0 .2rem 14px;margin:.6rem 0 1.2rem;line-height:1.6}
 
 /* Contact form */
 .contact-form{display:flex;flex-direction:column;gap:14px;max-width:520px;margin:1.5rem auto 0}
