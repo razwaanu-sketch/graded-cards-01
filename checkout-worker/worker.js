@@ -62,7 +62,7 @@ export default {
     try {
       catalog = await loadCatalog();
     } catch (e) {
-      return jsonResponse({ error: "Could not load catalog" }, 502);
+      return jsonResponse({ error: `Could not load catalog: ${e.message}` }, 502);
     }
 
     const items = ids.map((id) => catalog.find((p) => p.id === id)).filter(Boolean);
