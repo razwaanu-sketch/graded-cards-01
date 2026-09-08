@@ -89,7 +89,10 @@ export default {
 
     const params = new URLSearchParams();
     params.set("mode", "payment");
-    params.set("success_url", `${SITE_ORIGIN}/cart.html?checkout=success`);
+    // {CHECKOUT_SESSION_ID} is a literal placeholder Stripe substitutes with
+    // the real session id on redirect — used client-side as the GA4
+    // purchase event's transaction_id (see cart-page.js).
+    params.set("success_url", `${SITE_ORIGIN}/cart.html?checkout=success&session_id={CHECKOUT_SESSION_ID}`);
     params.set("cancel_url", `${SITE_ORIGIN}/cart.html?checkout=cancelled`);
     params.append("shipping_address_collection[allowed_countries][]", "GB");
 

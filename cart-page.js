@@ -105,6 +105,9 @@
       removeBtn.textContent = "Remove";
       removeBtn.addEventListener("click", () => {
         window.EPSACart.removeFromCart(product.id);
+        if (window.EPSAAnalytics) {
+          window.EPSAAnalytics.trackEvent("remove_from_cart", { item_id: product.id, item_name: product.name, value: product.price });
+        }
         render();
       });
 
@@ -169,7 +172,25 @@
     if (!status || !resultEl) return;
 
     if (status === "success") {
-      window.EPSACart.getCartIds().forEach((id) => window.EPSACart.removeFromCart(id));
+      const ids = window.EPSACart.getCartIds();
+      const items = ids.map((id) => PRODUCTS.find((p) => p.id === id)).filter(Boolean);
+
+      // Only the combined-checkout flow (via CHECKOUT_ENDPOINT) returns here
+      // with ?checkout=success — a single "Pay for this card" Stripe Payment
+      // Link redirects to Stripe's own confirmation page instead, so a
+      // purchase from that flow currently won't fire this event. See
+      // GA4-SETUP.md for the trade-off.
+      if (window.EPSAAnalytics && items.length) {
+        const sessionId = params.get("session_id");
+        window.EPSAAnalytics.trackEvent("purchase", {
+          transaction_id: sessionId || `local-${Date.now()}`,
+          value: items.reduce((sum, p) => sum + p.price, 0),
+          currency: items[0].currency || "GBP",
+          items: items.map((p) => ({ item_id: p.id, item_name: p.name, price: p.price })),
+        });
+      }
+
+      ids.forEach((id) => window.EPSACart.removeFromCart(id));
       resultEl.hidden = false;
       resultEl.classList.add("checkout-result-success");
       resultEl.textContent = "Payment received — thank you! We'll email you tracking details once your order ships.";
@@ -183,5 +204,14 @@
   document.addEventListener("DOMContentLoaded", () => {
     handleCheckoutReturn();
     render();
+
+    const items = window.EPSACart.getCartIds().map((id) => PRODUCTS.find((p) => p.id === id)).filter(Boolean);
+    if (window.EPSAAnalytics && items.length) {
+      window.EPSAAnalytics.trackEvent("view_cart", {
+        value: items.reduce((sum, p) => sum + p.price, 0),
+        currency: items[0].currency || "GBP",
+        items: items.map((p) => ({ item_id: p.id, item_name: p.name, price: p.price })),
+      });
+    }
   });
 })();
