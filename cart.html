@@ -56,6 +56,8 @@
         <p style="text-align:center">Your cart is empty. <a href="index.html#shop">Browse the collection →</a></p>
       </div>
 
+      <p id="checkout-result" class="checkout-result" hidden></p>
+
       <div id="cart-list" class="cart-list"></div>
 
       <div id="cart-summary" class="cart-summary" hidden>
@@ -63,7 +65,9 @@
           <span>Subtotal</span>
           <span id="cart-subtotal"></span>
         </div>
-        <p class="form-note">
+        <button type="button" id="combined-checkout-btn" class="btn-gold btn-block" hidden>Pay for everything (1 checkout)</button>
+        <p id="combined-checkout-status" class="checkout-status" hidden></p>
+        <p id="combined-invoice-note" class="form-note">
           Because each card is a unique, individually graded item, you'll complete payment for each card
           separately using its own secure Stripe link above. Want everything on one combined payment instead?
           <a id="combined-invoice-link" href="contact.html">Request a combined invoice</a> and we'll send you a

@@ -87,12 +87,41 @@ details are filled in on those pages.
 - **PSA verification:** each product already stores its PSA cert number —
   consider linking it to `https://www.psacard.com/cert/<certNumber>` on the
   product card so buyers can one-click verify.
-- **True one-click checkout for multiple cards:** to let a buyer pay for
-  their whole cart in a single Stripe payment (rather than one Stripe link
-  per card), you'd need a small serverless function (e.g. a Cloudflare
-  Pages Function or Netlify Function) that creates a Stripe Checkout
-  Session with the cart's items server-side — Stripe requires a server for
-  this because it needs your secret key, which can never go in client-side
-  code. This is a bigger step (new hosting/deploy target alongside GitHub
-  Pages) — ask if you want help setting it up once the rest of the store is
-  live.
+## 4. Enable single combined checkout (optional but built and ready)
+
+Right now a buyer with multiple cards in their cart pays for each one
+separately. `checkout-worker/worker.js` is a ready-to-deploy Cloudflare
+Worker that creates ONE Stripe Checkout Session covering the whole cart.
+It never needs your Stripe secret key to leave Cloudflare's dashboard.
+
+1. Go to [dash.cloudflare.com](https://dash.cloudflare.com) → sign up free
+   (no credit card needed) → **Workers & Pages** → **Create** → **Worker**.
+2. Give it a name (e.g. `gradedcards01-checkout`), then open the editor and
+   replace the sample code with the contents of `checkout-worker/worker.js`
+   from this repo.
+3. Go to the Worker's **Settings → Variables and Secrets** → add a secret
+   named `STRIPE_SECRET_KEY` with your **secret key** from
+   [Stripe Dashboard → Developers → API keys](https://dashboard.stripe.com/apikeys)
+   (starts with `sk_live_...`). This stays inside Cloudflare — never paste it
+   anywhere else.
+4. Click **Deploy**. You'll get a URL like
+   `https://gradedcards01-checkout.<your-subdomain>.workers.dev`.
+5. Open `cart-page.js` in this repo, find `const CHECKOUT_ENDPOINT = "";`
+   near the top, and paste that URL in between the quotes.
+6. Commit and push. The cart page will now show a "Pay for everything
+   (1 checkout)" button whenever there's more than one item, alongside the
+   existing per-card links.
+
+## Optional upgrades later
+
+- **Real contact form (no email-client popup):** sign up free at
+  [Formspree](https://formspree.io), and swap the `contact.js` mailto logic
+  for a `fetch()` POST to your Formspree endpoint.
+- **More cards:** copy a block in `products.js`, give it a new `id`, a
+  `tags` entry (used by the category tiles / filter chips), and add its
+  image + Stripe link the same way. Update the `sub` counts in the
+  `CATEGORIES` array at the bottom of `products.js` if you change how many
+  cards are in a category.
+- **PSA verification:** each product already stores its PSA cert number —
+  consider linking it to `https://www.psacard.com/cert/<certNumber>` on the
+  product card so buyers can one-click verify.

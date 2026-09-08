@@ -107,6 +107,7 @@ body{
   outline:none;
 }
 .btn-block{display:block;width:100%;text-align:center}
+.btn-block[hidden]{display:none}
 .btn-ghost, .btn-outline{
   background:transparent;border:1px solid var(--line);color:var(--ink);padding:.7rem 1rem;border-radius:0;text-decoration:none;font-weight:600;font-size:.88rem;
   transition:border-color .18s var(--ease),color .18s var(--ease);
@@ -251,6 +252,10 @@ body{
 .cart-summary{margin-top:24px;padding:20px;background:var(--bg-deep);border:1px solid var(--line-soft);border-radius:0}
 .cart-summary-row{display:flex;justify-content:space-between;font-weight:800;font-size:1.1rem;margin-bottom:10px}
 .cart-summary-row span:last-child{color:var(--gold)}
+.cart-summary .btn-block{margin:4px 0 14px}
+.checkout-status{color:#e7b8b8;font-size:.82rem;margin:-4px 0 12px}
+.checkout-result{font-family:var(--mono);font-size:.85rem;padding:14px 16px;margin:0 0 20px;border-left:2px solid var(--gold);background:var(--bg-card);color:var(--ink)}
+.checkout-result-cancelled{border-left-color:var(--ink-faint)}
 
 @media(min-width:600px){
   .cart-row-actions{flex:0 0 auto;align-items:center}

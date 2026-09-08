@@ -1,10 +1,19 @@
 // Renders the cart.html page: line items, subtotal, and per-item payment links.
 (function () {
+  // Set this to your deployed Cloudflare Worker URL (see checkout-worker/worker.js
+  // and SETUP.md) to enable a single combined Stripe checkout for the whole cart.
+  // Left blank, the page falls back to the existing "request a combined invoice" flow.
+  const CHECKOUT_ENDPOINT = "";
+
   const listEl = document.getElementById("cart-list");
   const emptyEl = document.getElementById("cart-empty");
   const summaryEl = document.getElementById("cart-summary");
   const subtotalEl = document.getElementById("cart-subtotal");
   const invoiceLink = document.getElementById("combined-invoice-link");
+  const invoiceNote = document.getElementById("combined-invoice-note");
+  const checkoutBtn = document.getElementById("combined-checkout-btn");
+  const checkoutStatus = document.getElementById("combined-checkout-status");
+  const resultEl = document.getElementById("checkout-result");
   if (!listEl || typeof PRODUCTS === "undefined" || !window.EPSACart) return;
 
   const formatPrice = (amount, currency) => {
@@ -115,7 +124,64 @@
       const msg = `Hi, I'd like a combined invoice for these cards from my cart: ${list}. Subtotal: ${formatPrice(subtotal, "GBP")}.`;
       invoiceLink.href = `contact.html?prefill=${encodeURIComponent(msg)}`;
     }
+
+    if (CHECKOUT_ENDPOINT && checkoutBtn) {
+      const anySold = items.some((p) => p.sold);
+      checkoutBtn.hidden = anySold;
+      if (invoiceNote) invoiceNote.hidden = !anySold;
+      checkoutBtn.disabled = false;
+      checkoutBtn.textContent = "Pay for everything (1 checkout)";
+      checkoutBtn.onclick = () => startCombinedCheckout(ids);
+    } else if (checkoutBtn) {
+      checkoutBtn.hidden = true;
+    }
   }
 
-  document.addEventListener("DOMContentLoaded", render);
+  async function startCombinedCheckout(ids) {
+    checkoutBtn.disabled = true;
+    checkoutBtn.textContent = "Redirecting to secure checkout…";
+    checkoutStatus.hidden = true;
+    try {
+      const res = await fetch(CHECKOUT_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.url) {
+        throw new Error(data.error || "Something went wrong starting checkout.");
+      }
+      if (window.EPSAAnalytics) {
+        window.EPSAAnalytics.trackEvent("begin_checkout", { items: ids.length, checkout_type: "combined" });
+      }
+      window.location.href = data.url;
+    } catch (err) {
+      checkoutStatus.hidden = false;
+      checkoutStatus.textContent = err.message || "Could not start checkout — please try again, or use the individual payment links above.";
+      checkoutBtn.disabled = false;
+      checkoutBtn.textContent = "Pay for everything (1 checkout)";
+    }
+  }
+
+  function handleCheckoutReturn() {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("checkout");
+    if (!status || !resultEl) return;
+
+    if (status === "success") {
+      window.EPSACart.getCartIds().forEach((id) => window.EPSACart.removeFromCart(id));
+      resultEl.hidden = false;
+      resultEl.classList.add("checkout-result-success");
+      resultEl.textContent = "Payment received — thank you! We'll email you tracking details once your order ships.";
+    } else if (status === "cancelled") {
+      resultEl.hidden = false;
+      resultEl.classList.add("checkout-result-cancelled");
+      resultEl.textContent = "Checkout was cancelled — your cart is still saved below.";
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    handleCheckoutReturn();
+    render();
+  });
 })();
