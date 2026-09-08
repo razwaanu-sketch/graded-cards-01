@@ -70,12 +70,9 @@ option.
 
 ## 3. Fill in your real business details
 
-Search each of these files for text wrapped in `[LIKE THIS]` and replace it
-with your real details:
-
-- `contact.js` — replace `your-email@example.com` with your real contact email
-- `contact.html`, `about.html`, `shipping.html`, `terms.html`, `privacy.html`
-  — business name, email, shipping regions/cost, returns window, country
+Done — all contact points (contact form, About, Shipping, Terms, Privacy)
+route to `Gradedcards01@outlook.com`, and the business/shipping/returns
+details are filled in on those pages.
 
 ## Optional upgrades later
 
