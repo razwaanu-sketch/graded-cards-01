@@ -30,12 +30,25 @@ function jsonResponse(body, status) {
   });
 }
 
+// Workers disallow dynamic code evaluation (new Function/eval), so the
+// extracted array literal is converted to strict JSON instead of executed:
+// unquoted object keys get quoted, and trailing commas are stripped. This
+// is safe for our own known data shape (plain strings/numbers/booleans/
+// arrays, no nested functions) and never touches string contents like the
+// "https://" in stripeLink, since the key-matching regex only fires after
+// a preceding "{", "," or whitespace, never after a quote character.
+function productsJsToJson(arrayLiteralText) {
+  let out = arrayLiteralText.replace(/([{,]\s*)([A-Za-z_$][A-Za-z0-9_$]*)\s*:/g, '$1"$2":');
+  out = out.replace(/,(\s*[}\]])/g, "$1");
+  return JSON.parse(out);
+}
+
 async function loadCatalog() {
   const res = await fetch(`${SITE_ORIGIN}/products.js?t=${Date.now()}`);
   const text = await res.text();
   const match = text.match(/const PRODUCTS = (\[[\s\S]*?\]);/);
   if (!match) throw new Error("Could not parse products.js");
-  return new Function(`return ${match[1]}`)();
+  return productsJsToJson(match[1]);
 }
 
 export default {
