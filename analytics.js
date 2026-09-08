@@ -1,7 +1,7 @@
 // Google Analytics (GA4), loaded only after cookie consent — see privacy.html.
 // Consent choice is remembered in localStorage so the banner only shows once.
 (function () {
-  const GA_MEASUREMENT_ID = "G-XXXXXXXXXX"; // TODO: replace with your real GA4 Measurement ID
+  const GA_MEASUREMENT_ID = "G-WGG2PJMTFW";
   const CONSENT_KEY = "epsa_cookie_consent";
 
   function loadGA() {
