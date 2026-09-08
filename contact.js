@@ -5,7 +5,7 @@
   const form = document.getElementById("contact-form");
   if (!form) return;
 
-  const CONTACT_EMAIL = "your-email@example.com"; // TODO: replace with your real contact email
+  const CONTACT_EMAIL = "Gradedcards01@outlook.com";
 
   // Pre-fill the message from ?prefill= (used by the cart page's "combined invoice" link)
   const params = new URLSearchParams(window.location.search);
