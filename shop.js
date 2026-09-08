@@ -27,34 +27,34 @@
     return matchesTag && matchesQuery;
   }
 
-  function renderCartAction(footer, product) {
+  function renderCartAction(container, product) {
     if (product.sold) {
       const span = document.createElement("span");
-      span.className = "btn-outline btn-disabled";
+      span.className = "btn-outline btn-disabled btn-block";
       span.textContent = "Sold out";
-      footer.appendChild(span);
+      container.appendChild(span);
       return;
     }
 
     const btn = document.createElement("button");
     btn.type = "button";
     const inCart = window.EPSACart && window.EPSACart.isInCart(product.id);
-    btn.className = inCart ? "btn-outline cart-toggle in-cart" : "btn-gold cart-toggle";
+    btn.className = inCart ? "btn-outline cart-toggle in-cart btn-block" : "btn-gold cart-toggle btn-block";
     btn.textContent = inCart ? "In cart ✓" : "Add to cart";
     btn.setAttribute("aria-label", `${inCart ? "Remove" : "Add"} ${product.name} ${inCart ? "from" : "to"} cart`);
     btn.addEventListener("click", () => {
       if (!window.EPSACart) return;
       if (window.EPSACart.isInCart(product.id)) {
         window.EPSACart.removeFromCart(product.id);
-        btn.className = "btn-gold cart-toggle";
+        btn.className = "btn-gold cart-toggle btn-block";
         btn.textContent = "Add to cart";
       } else {
         window.EPSACart.addToCart(product.id);
-        btn.className = "btn-outline cart-toggle in-cart";
+        btn.className = "btn-outline cart-toggle in-cart btn-block";
         btn.textContent = "In cart ✓";
       }
     });
-    footer.appendChild(btn);
+    container.appendChild(btn);
   }
 
   function renderCard(product) {
@@ -111,12 +111,17 @@
     price.className = "price";
     price.textContent = formatPrice(product.price, product.currency);
     footer.appendChild(price);
-    renderCartAction(footer, product);
+
+    const oneOf = document.createElement("span");
+    oneOf.className = "oneof";
+    oneOf.textContent = "1 of 1";
+    footer.appendChild(oneOf);
 
     body.appendChild(title);
     body.appendChild(meta);
     body.appendChild(cert);
     body.appendChild(footer);
+    renderCartAction(body, product);
 
     card.appendChild(media);
     card.appendChild(body);
