@@ -78,6 +78,11 @@
         payBtn.target = "_blank";
         payBtn.rel = "noopener";
         payBtn.textContent = "Pay for this card";
+        payBtn.addEventListener("click", () => {
+          if (window.EPSAAnalytics) {
+            window.EPSAAnalytics.trackEvent("begin_checkout", { item_id: product.id, item_name: product.name, value: product.price });
+          }
+        });
       } else {
         payBtn = document.createElement("a");
         payBtn.className = "btn-outline";

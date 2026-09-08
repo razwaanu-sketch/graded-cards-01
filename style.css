@@ -277,6 +277,12 @@ body{
 .footer-links a{color:var(--ink-faint);text-decoration:none}
 .footer-links a:hover{color:var(--gold)}
 
+/* Cookie consent banner */
+.cookie-banner{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;background:var(--bg-card);border-top:1px solid var(--gold);padding:16px 18px;box-shadow:0 -8px 24px rgba(0,0,0,.35)}
+.cookie-banner p{margin:0;color:var(--ink-dim);font-size:.85rem;max-width:640px}
+.cookie-banner a{color:var(--gold)}
+.cookie-banner-actions{display:flex;gap:10px;flex:0 0 auto}
+
 /* Larger screens */
 @media(min-width:780px){
   .nav-menu{display:flex}

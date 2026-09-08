@@ -52,6 +52,9 @@
         window.EPSACart.addToCart(product.id);
         btn.className = "btn-outline cart-toggle in-cart btn-block";
         btn.textContent = "In cart ✓";
+        if (window.EPSAAnalytics) {
+          window.EPSAAnalytics.trackEvent("add_to_cart", { item_id: product.id, item_name: product.name, value: product.price });
+        }
       }
     });
     container.appendChild(btn);
