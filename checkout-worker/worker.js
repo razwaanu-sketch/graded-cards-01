@@ -92,10 +92,16 @@ export default {
       params.set(`line_items[${i}][price_data][product_data][images][0]`, `${SITE_ORIGIN}/${p.image}`);
     });
 
+    // Supports both a classic plain-text secret (env.STRIPE_SECRET_KEY is a
+    // string) and a Secrets Store binding (env.STRIPE_SECRET_KEY.get()),
+    // since Cloudflare's dashboard may offer either depending on setup.
+    const stripeKey =
+      typeof env.STRIPE_SECRET_KEY === "string" ? env.STRIPE_SECRET_KEY : await env.STRIPE_SECRET_KEY.get();
+
     const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
+        Authorization: `Bearer ${stripeKey}`,
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: params.toString(),
