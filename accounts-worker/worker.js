@@ -1,5 +1,7 @@
 // Cloudflare Worker: customer accounts, order history, and return requests,
-// backed by D1. See ../ACCOUNTS-SETUP.md for the deploy checklist.
+// backed by D1. Deployed as its own Cloudflare Workers Builds project with
+// its root directory set to this folder (accounts-worker/), independent of
+// the checkout Worker's own project — see ../ACCOUNTS-SETUP.md.
 //
 // Auth model: email + password, PBKDF2-SHA256 hashed (100k iterations) with
 // a random salt per user — no plaintext or reversible storage. Sessions are
