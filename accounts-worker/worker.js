@@ -479,7 +479,16 @@ async function handleCheckoutCompleted(session, env) {
     `https://api.stripe.com/v1/checkout/sessions/${session.id}?expand[]=line_items&expand[]=payment_intent.latest_charge`,
     { headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` } }
   );
-  const fullSession = await sessionRes.json();
+  const sessionResText = await sessionRes.text();
+  if (!sessionRes.ok) {
+    console.error(`Stripe session expand fetch failed (${sessionRes.status}): ${sessionResText}`);
+  }
+  let fullSession = {};
+  try {
+    fullSession = JSON.parse(sessionResText);
+  } catch (e) {
+    console.error(`Stripe session expand response wasn't valid JSON: ${sessionResText}`);
+  }
 
   const paymentIntent = fullSession.payment_intent;
   const paymentIntentId = paymentIntent ? paymentIntent.id : null;
