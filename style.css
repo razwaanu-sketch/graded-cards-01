@@ -250,6 +250,13 @@ body{
 .order-row-name{font-weight:700;color:var(--ink)}
 .order-row-amount{color:var(--gold);font-weight:700;text-align:right}
 .order-row-date, .order-row-status{color:var(--ink-faint);font-family:var(--mono);font-size:.75rem;text-transform:uppercase}
+.order-return{grid-column:1/-1;margin-top:8px;padding-top:10px;border-top:1px solid var(--line-soft)}
+.return-status-pill{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--gold)}
+.return-request-btn{font-size:.82rem}
+.return-request-form{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.return-request-form[hidden]{display:none}
+.return-request-form textarea{flex:1 1 220px;min-width:0;background:var(--bg-card);border:1px solid var(--line);color:var(--ink);font:inherit;padding:.5rem .6rem}
+.return-request-form .account-error{flex-basis:100%}
 
 /* Cart page */
 .cart-page{max-width:820px}

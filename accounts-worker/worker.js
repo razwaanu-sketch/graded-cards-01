@@ -1,10 +1,5 @@
-// Cloudflare Worker: customer accounts + order history, backed by D1.
-//
-// NOT DEPLOYED / NOT LIVE. This is staged backend code — see
-// ../ACCOUNTS-SETUP.md for the full checklist before this ever goes live
-// (create the D1 database, run schema.sql, deploy this Worker, set secrets,
-// register the Stripe webhook, then wire account.html's ACCOUNTS_API to the
-// deployed URL and link it from the site nav).
+// Cloudflare Worker: customer accounts, order history, and return requests,
+// backed by D1. See ../ACCOUNTS-SETUP.md for the deploy checklist.
 //
 // Auth model: email + password, PBKDF2-SHA256 hashed (100k iterations) with
 // a random salt per user — no plaintext or reversible storage. Sessions are
@@ -16,12 +11,21 @@
 // most SPA token-auth setups; there's no server-rendered/user-generated
 // content on this site to make that a live risk today, but if that ever
 // changes, move to httpOnly cookies scoped to a shared custom domain
-// (e.g. api.gradedcards01.com) instead.
+// (e.g. api.gradedcards01.com) instead. Only a SHA-256 hash of the token is
+// stored in D1, never the raw value, so a copy of the database alone can't
+// be used to impersonate an active session.
+//
+// Failed logins are rate-limited per email with a growing lockout window
+// (see lockoutMinutesFor) to blunt password guessing.
 //
 // Orders are populated by a Stripe webhook (checkout.session.completed),
 // never entered by hand — one row per card, matched to an account purely by
 // email (so an order recorded before someone creates an account still shows
 // up once they sign up with the same email).
+//
+// Return requests (POST /api/returns) are buyer-raised and stored as a
+// system of record, but there's no seller-facing admin page yet — see
+// ACCOUNTS-SETUP.md for how to review and action them via the D1 console.
 
 const SITE_ORIGIN = "https://www.gradedcards01.com";
 const SESSION_DAYS = 30;
@@ -82,6 +86,21 @@ function generateToken() {
   return bytesToHex(crypto.getRandomValues(new Uint8Array(32)));
 }
 
+async function hashToken(token) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(token));
+  return bytesToHex(new Uint8Array(digest));
+}
+
+// Lockout grows with repeated failures rather than a flat count, so a
+// single mistyped password never locks anyone out, but sustained guessing
+// gets slower and slower.
+function lockoutMinutesFor(failedCount) {
+  if (failedCount < 5) return 0;
+  if (failedCount < 8) return 1;
+  if (failedCount < 12) return 15;
+  return 60;
+}
+
 function isValidEmail(email) {
   return typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -94,11 +113,21 @@ async function getUserFromRequest(request, env) {
   const row = await env.DB.prepare(
     `SELECT users.id, users.email FROM sessions
      JOIN users ON users.id = sessions.user_id
-     WHERE sessions.token = ? AND sessions.expires_at > datetime('now')`
+     WHERE sessions.token_hash = ? AND sessions.expires_at > datetime('now')`
   )
-    .bind(token)
+    .bind(await hashToken(token))
     .first();
   return row || null;
+}
+
+async function createSession(env, userId) {
+  const token = generateToken();
+  await env.DB.prepare(
+    `INSERT INTO sessions (token_hash, user_id, expires_at) VALUES (?, ?, datetime('now', '+${SESSION_DAYS} days'))`
+  )
+    .bind(await hashToken(token), userId)
+    .run();
+  return token;
 }
 
 async function handleSignup(request, env) {
@@ -118,15 +147,8 @@ async function handleSignup(request, env) {
   )
     .bind(email, hash, salt)
     .run();
-  const userId = result.meta.last_row_id;
 
-  const token = generateToken();
-  await env.DB.prepare(
-    `INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, datetime('now', '+${SESSION_DAYS} days'))`
-  )
-    .bind(token, userId)
-    .run();
-
+  const token = await createSession(env, result.meta.last_row_id);
   return jsonResponse({ token, email });
 }
 
@@ -134,6 +156,18 @@ async function handleLogin(request, env) {
   const body = await request.json().catch(() => ({}));
   const email = (body.email || "").trim().toLowerCase();
   const password = body.password || "";
+
+  const attempt = await env.DB.prepare(
+    "SELECT failed_count, locked_until FROM login_attempts WHERE email = ?"
+  )
+    .bind(email)
+    .first();
+  if (attempt && attempt.locked_until) {
+    const stillLocked = await env.DB.prepare("SELECT datetime('now') < ? AS locked").bind(attempt.locked_until).first();
+    if (stillLocked && stillLocked.locked) {
+      return jsonResponse({ error: "Too many failed attempts — please try again in a few minutes." }, 429);
+    }
+  }
 
   const user = await env.DB.prepare(
     "SELECT id, email, password_hash, password_salt FROM users WHERE email = ?"
@@ -145,23 +179,28 @@ async function handleLogin(request, env) {
   // wrong, so a login attempt can't be used to discover which emails have
   // accounts.
   if (!user || !(await verifyPassword(password, user.password_hash, user.password_salt))) {
+    const failedCount = (attempt ? attempt.failed_count : 0) + 1;
+    const lockoutMinutes = lockoutMinutesFor(failedCount);
+    await env.DB.prepare(
+      `INSERT INTO login_attempts (email, failed_count, locked_until) VALUES (?, ?, ${
+        lockoutMinutes ? `datetime('now', '+${lockoutMinutes} minutes')` : "NULL"
+      })
+       ON CONFLICT(email) DO UPDATE SET failed_count = excluded.failed_count, locked_until = excluded.locked_until`
+    )
+      .bind(email, failedCount)
+      .run();
     return jsonResponse({ error: "Incorrect email or password." }, 401);
   }
 
-  const token = generateToken();
-  await env.DB.prepare(
-    `INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, datetime('now', '+${SESSION_DAYS} days'))`
-  )
-    .bind(token, user.id)
-    .run();
-
+  await env.DB.prepare("DELETE FROM login_attempts WHERE email = ?").bind(email).run();
+  const token = await createSession(env, user.id);
   return jsonResponse({ token, email: user.email });
 }
 
 async function handleLogout(request, env) {
   const auth = request.headers.get("Authorization") || "";
   const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
-  if (token) await env.DB.prepare("DELETE FROM sessions WHERE token = ?").bind(token).run();
+  if (token) await env.DB.prepare("DELETE FROM sessions WHERE token_hash = ?").bind(await hashToken(token)).run();
   return jsonResponse({ ok: true });
 }
 
@@ -170,13 +209,46 @@ async function handleMe(request, env) {
   if (!user) return jsonResponse({ error: "Not signed in." }, 401);
 
   const { results } = await env.DB.prepare(
-    `SELECT product_id, product_name, amount, currency, status, stripe_session_id, created_at
-     FROM orders WHERE customer_email = ? ORDER BY created_at DESC`
+    `SELECT o.id AS order_id, o.product_id, o.product_name, o.amount, o.currency, o.status,
+            o.stripe_session_id, o.created_at,
+            r.status AS return_status, r.reason AS return_reason, r.requested_at AS return_requested_at
+     FROM orders o
+     LEFT JOIN returns r ON r.order_id = o.id
+     WHERE o.customer_email = ?
+     ORDER BY o.created_at DESC`
   )
     .bind(user.email)
     .all();
 
   return jsonResponse({ email: user.email, orders: results || [] });
+}
+
+async function handleCreateReturn(request, env) {
+  const user = await getUserFromRequest(request, env);
+  if (!user) return jsonResponse({ error: "Not signed in." }, 401);
+
+  const body = await request.json().catch(() => ({}));
+  const orderId = Number(body.order_id);
+  const reason = (body.reason || "").trim();
+  if (!orderId) return jsonResponse({ error: "Missing order." }, 400);
+  if (!reason) return jsonResponse({ error: "Please describe the reason for your return." }, 400);
+  if (reason.length > 1000) return jsonResponse({ error: "Reason is too long." }, 400);
+
+  // Ownership check: the order must actually belong to this signed-in user's
+  // email — otherwise anyone could raise a return against any order id.
+  const order = await env.DB.prepare("SELECT id FROM orders WHERE id = ? AND customer_email = ?")
+    .bind(orderId, user.email)
+    .first();
+  if (!order) return jsonResponse({ error: "Order not found." }, 404);
+
+  const existing = await env.DB.prepare("SELECT id FROM returns WHERE order_id = ?").bind(orderId).first();
+  if (existing) return jsonResponse({ error: "A return has already been requested for this order." }, 409);
+
+  await env.DB.prepare("INSERT INTO returns (order_id, user_id, reason, status) VALUES (?, ?, ?, 'requested')")
+    .bind(orderId, user.id, reason)
+    .run();
+
+  return jsonResponse({ ok: true });
 }
 
 // --- Stripe webhook -------------------------------------------------------
@@ -273,6 +345,7 @@ export default {
       if (url.pathname === "/api/login" && request.method === "POST") return await handleLogin(request, env);
       if (url.pathname === "/api/logout" && request.method === "POST") return await handleLogout(request, env);
       if (url.pathname === "/api/me" && request.method === "GET") return await handleMe(request, env);
+      if (url.pathname === "/api/returns" && request.method === "POST") return await handleCreateReturn(request, env);
       if (url.pathname === "/api/stripe-webhook" && request.method === "POST")
         return await handleStripeWebhook(request, env);
     } catch (e) {
