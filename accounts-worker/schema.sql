@@ -53,13 +53,18 @@ CREATE TABLE IF NOT EXISTS orders (
   user_id INTEGER REFERENCES users(id),
   customer_email TEXT NOT NULL,
   stripe_session_id TEXT NOT NULL,
+  payment_intent_id TEXT,
+  receipt_url TEXT,
   product_id TEXT,
   product_name TEXT NOT NULL,
   amount INTEGER NOT NULL,
   currency TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'paid',
+  status TEXT NOT NULL DEFAULT 'paid', -- paid | refunded | partially_refunded
+  refunded_amount INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE INDEX IF NOT EXISTS idx_orders_payment_intent ON orders(payment_intent_id);
 
 CREATE INDEX IF NOT EXISTS idx_orders_email ON orders(customer_email);
 CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at);
