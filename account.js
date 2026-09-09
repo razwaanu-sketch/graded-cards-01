@@ -87,8 +87,54 @@
         <span class="order-row-status">${order.status}</span>
         <span class="order-row-amount">${formatAmount(order.amount, order.currency)}</span>
       `;
+
+      const returnEl = document.createElement("div");
+      returnEl.className = "order-return";
+      if (order.return_status) {
+        returnEl.innerHTML = `<span class="return-status-pill">Return: ${order.return_status}</span>`;
+      } else {
+        returnEl.innerHTML = `
+          <button type="button" class="btn-ghost return-request-btn">Request a return</button>
+          <form class="return-request-form" hidden>
+            <textarea rows="2" placeholder="Reason for return" required maxlength="1000"></textarea>
+            <button type="submit" class="btn-outline">Submit request</button>
+            <p class="account-error" hidden></p>
+          </form>
+        `;
+        const btn = returnEl.querySelector(".return-request-btn");
+        const form = returnEl.querySelector(".return-request-form");
+        btn.addEventListener("click", () => {
+          btn.hidden = true;
+          form.hidden = false;
+        });
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          submitReturn(order.order_id, form);
+        });
+      }
+      row.appendChild(returnEl);
+
       orderListEl.appendChild(row);
     });
+  }
+
+  async function submitReturn(orderId, form) {
+    const reason = form.querySelector("textarea").value.trim();
+    const submitBtn = form.querySelector("button[type='submit']");
+    submitBtn.disabled = true;
+    try {
+      const res = await fetch(`${ACCOUNTS_API}/api/returns`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify({ order_id: orderId, reason }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not submit return request.");
+      loadAccount();
+    } catch (err) {
+      showError(form, err.message);
+      submitBtn.disabled = false;
+    }
   }
 
   async function loadAccount() {
