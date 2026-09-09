@@ -1,11 +1,11 @@
 // Powers account.html: sign up, log in, and order history.
 //
-// NOT LIVE — ACCOUNTS_API is intentionally blank until the backend Worker
-// (see accounts-worker/) is actually deployed. Until then this page just
-// shows an "aren't switched on yet" notice, so it's harmless if it ever
-// gets linked or found before the backend exists. See ACCOUNTS-SETUP.md.
+// Backend: accounts-worker/, deployed as its own Cloudflare Workers Builds
+// project (see ../ACCOUNTS-SETUP.md). This page is not yet linked from the
+// site navigation while it's being tested end-to-end with the real Worker
+// and Stripe flows — it's reachable only by direct URL until that's done.
 (function () {
-  const ACCOUNTS_API = "";
+  const ACCOUNTS_API = "https://gradedcards01-accounts.gradedcards01.workers.dev";
   const TOKEN_KEY = "epsa_auth_token";
 
   const unavailableEl = document.getElementById("account-unavailable");
