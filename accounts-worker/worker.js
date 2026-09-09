@@ -469,6 +469,13 @@ async function handleStripeWebhook(request, env) {
   const email = (session.customer_details && session.customer_details.email) || session.customer_email;
   if (!email) return jsonResponse({ received: true });
 
+  // Stripe redelivers this event on any timeout or non-2xx response, so
+  // guard against inserting the same session's orders twice.
+  const alreadyProcessed = await env.DB.prepare("SELECT id FROM orders WHERE stripe_session_id = ? LIMIT 1")
+    .bind(session.id)
+    .first();
+  if (alreadyProcessed) return jsonResponse({ received: true });
+
   // Stripe's webhook payload for a Checkout Session doesn't include full
   // line items by default; fetch them with an expand so each card sold
   // becomes its own order row (a combined checkout can contain several).
