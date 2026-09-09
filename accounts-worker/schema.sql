@@ -7,8 +7,23 @@ CREATE TABLE IF NOT EXISTS users (
   email TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
   password_salt TEXT NOT NULL,
+  email_verified INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+-- Shared table for both email-verification and password-reset links: a
+-- random token is emailed to the user, only its SHA-256 hash is stored
+-- here (same reasoning as sessions.token_hash), and it's single-use +
+-- time-limited (24h for verification, 1h for reset — see worker.js).
+CREATE TABLE IF NOT EXISTS email_tokens (
+  token_hash TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id),
+  purpose TEXT NOT NULL, -- 'verify' | 'reset'
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  expires_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_email_tokens_user ON email_tokens(user_id);
 
 -- Stores a SHA-256 hash of the session token, never the raw value — if this
 -- database were ever exposed, a copy of it alone wouldn't let anyone log in

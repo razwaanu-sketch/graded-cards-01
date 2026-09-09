@@ -57,6 +57,8 @@
         Accounts aren't switched on yet — check back soon.
       </div>
 
+      <p id="account-notice" class="account-notice" hidden></p>
+
       <div id="account-signed-out" hidden>
         <div class="account-tabs" role="tablist">
           <button type="button" class="account-tab active" data-tab="login" role="tab" aria-selected="true">Log in</button>
@@ -71,6 +73,7 @@
             <input type="password" id="login-password" name="password" required autocomplete="current-password">
           </label>
           <button type="submit" class="btn-gold">Log in</button>
+          <button type="button" id="forgot-password-link" class="link-btn">Forgot your password?</button>
           <p class="account-error" hidden></p>
         </form>
 
@@ -85,14 +88,43 @@
           <p class="form-note">At least 8 characters.</p>
           <p class="account-error" hidden></p>
         </form>
+
+        <form class="contact-form account-form" id="forgot-password-form" hidden>
+          <label for="forgot-password-email">Email
+            <input type="email" id="forgot-password-email" name="email" required autocomplete="email">
+          </label>
+          <button type="submit" class="btn-outline">Send reset link</button>
+          <button type="button" id="back-to-login-link" class="link-btn">Back to log in</button>
+          <p class="account-error" hidden></p>
+        </form>
+      </div>
+
+      <div id="reset-password-section" hidden>
+        <h2>Set a new password</h2>
+        <form class="contact-form account-form" id="reset-password-form">
+          <label for="reset-password-new">New password
+            <input type="password" id="reset-password-new" name="password" required autocomplete="new-password" minlength="8">
+          </label>
+          <button type="submit" class="btn-gold">Set new password</button>
+          <p class="form-note">At least 8 characters.</p>
+          <p class="account-error" hidden></p>
+        </form>
       </div>
 
       <div id="account-signed-in" hidden>
         <p class="account-welcome">Signed in as <strong id="account-email"></strong> — <button type="button" id="logout-btn" class="btn-ghost">Log out</button></p>
 
-        <h2>Order history</h2>
-        <div id="order-list" class="order-list"></div>
-        <p id="order-empty" class="form-note" hidden>No orders yet — once you buy a card, it'll show up here.</p>
+        <div id="verify-banner" class="verify-banner" hidden>
+          <p>Please verify your email to see your order history — check your inbox for a link.</p>
+          <button type="button" id="resend-verification-btn" class="btn-outline">Resend verification email</button>
+          <p class="account-error" hidden></p>
+        </div>
+
+        <div id="order-section" hidden>
+          <h2>Order history</h2>
+          <div id="order-list" class="order-list"></div>
+          <p id="order-empty" class="form-note" hidden>No orders yet — once you buy a card, it'll show up here.</p>
+        </div>
       </div>
     </section>
 
