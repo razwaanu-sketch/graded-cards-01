@@ -110,11 +110,20 @@
         month: "short",
         year: "numeric",
       });
+      const refundNote =
+        order.refunded_amount > 0
+          ? `<span class="order-row-refunded">Refunded ${formatAmount(order.refunded_amount, order.currency)}</span>`
+          : "";
+      const receiptLink = order.receipt_url
+        ? `<a class="order-row-receipt" href="${order.receipt_url}" target="_blank" rel="noopener">Receipt</a>`
+        : "";
       row.innerHTML = `
         <span class="order-row-name">${order.product_name}</span>
         <span class="order-row-date">${date}</span>
         <span class="order-row-status">${order.status}</span>
         <span class="order-row-amount">${formatAmount(order.amount, order.currency)}</span>
+        ${refundNote}
+        ${receiptLink}
       `;
 
       const returnEl = document.createElement("div");

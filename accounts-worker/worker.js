@@ -23,7 +23,11 @@
 // Orders are populated by a Stripe webhook (checkout.session.completed),
 // never entered by hand — one row per card, matched to an account purely by
 // email (so an order recorded before someone creates an account still shows
-// up once they sign up with the same email).
+// up once they sign up with the same email). Each order also stores its
+// Stripe receipt_url and payment_intent_id; a later charge.refunded event
+// on that payment_intent updates every order row from the same charge to
+// 'refunded' or 'partially_refunded'. Both event types must be selected on
+// the Stripe webhook destination — see ACCOUNTS-SETUP.md.
 //
 // Return requests (POST /api/returns) are buyer-raised and stored as a
 // system of record, but there's no seller-facing admin page yet — see
@@ -294,7 +298,7 @@ async function handleMe(request, env) {
 
   const { results } = await env.DB.prepare(
     `SELECT o.id AS order_id, o.product_id, o.product_name, o.amount, o.currency, o.status,
-            o.stripe_session_id, o.created_at,
+            o.stripe_session_id, o.receipt_url, o.refunded_amount, o.created_at,
             r.status AS return_status, r.reason AS return_reason, r.requested_at AS return_requested_at
      FROM orders o
      LEFT JOIN returns r ON r.order_id = o.id
@@ -454,41 +458,38 @@ async function verifyStripeSignature(payload, sigHeader, secret) {
   return timingSafeEqual(expected, v1);
 }
 
-async function handleStripeWebhook(request, env) {
-  const payload = await request.text();
-  const sig = request.headers.get("Stripe-Signature");
-  const valid = await verifyStripeSignature(payload, sig, env.STRIPE_WEBHOOK_SECRET);
-  if (!valid) return new Response("Invalid signature", { status: 400 });
-
-  const event = JSON.parse(payload);
-  if (event.type !== "checkout.session.completed") {
-    return jsonResponse({ received: true });
-  }
-
-  const session = event.data.object;
+async function handleCheckoutCompleted(session, env) {
   const email = (session.customer_details && session.customer_details.email) || session.customer_email;
-  if (!email) return jsonResponse({ received: true });
+  if (!email) return;
 
   // Stripe redelivers this event on any timeout or non-2xx response, so
   // guard against inserting the same session's orders twice.
   const alreadyProcessed = await env.DB.prepare("SELECT id FROM orders WHERE stripe_session_id = ? LIMIT 1")
     .bind(session.id)
     .first();
-  if (alreadyProcessed) return jsonResponse({ received: true });
+  if (alreadyProcessed) return;
 
-  // Stripe's webhook payload for a Checkout Session doesn't include full
-  // line items by default; fetch them with an expand so each card sold
-  // becomes its own order row (a combined checkout can contain several).
-  const lineItemsRes = await fetch(
-    `https://api.stripe.com/v1/checkout/sessions/${session.id}/line_items?limit=100`,
+  // Stripe's webhook payload for a Checkout Session doesn't include line
+  // items or charge details by default; re-fetch with both expanded in one
+  // call — line items so each card sold becomes its own order row (a
+  // combined checkout can contain several), and the charge for its
+  // receipt_url and payment_intent id (needed later to match refunds back
+  // to the right order rows).
+  const sessionRes = await fetch(
+    `https://api.stripe.com/v1/checkout/sessions/${session.id}?expand[]=line_items&expand[]=payment_intent.latest_charge`,
     { headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` } }
   );
-  const lineItems = await lineItemsRes.json();
+  const fullSession = await sessionRes.json();
+
+  const paymentIntent = fullSession.payment_intent;
+  const paymentIntentId = paymentIntent ? paymentIntent.id : null;
+  const receiptUrl = paymentIntent && paymentIntent.latest_charge ? paymentIntent.latest_charge.receipt_url : null;
 
   const user = await env.DB.prepare("SELECT id FROM users WHERE email = ?").bind(email.toLowerCase()).first();
 
-  const items = (lineItems.data || []).length
-    ? lineItems.data.map((li) => ({
+  const lineItems = (fullSession.line_items && fullSession.line_items.data) || [];
+  const items = lineItems.length
+    ? lineItems.map((li) => ({
         name: li.description || "Card",
         amount: li.amount_total,
         currency: (li.currency || session.currency || "gbp").toUpperCase(),
@@ -497,11 +498,48 @@ async function handleStripeWebhook(request, env) {
 
   for (const item of items) {
     await env.DB.prepare(
-      `INSERT INTO orders (user_id, customer_email, stripe_session_id, product_name, amount, currency, status)
-       VALUES (?, ?, ?, ?, ?, ?, 'paid')`
+      `INSERT INTO orders (user_id, customer_email, stripe_session_id, payment_intent_id, receipt_url, product_name, amount, currency, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'paid')`
     )
-      .bind(user ? user.id : null, email.toLowerCase(), session.id, item.name, item.amount, item.currency)
+      .bind(
+        user ? user.id : null,
+        email.toLowerCase(),
+        session.id,
+        paymentIntentId,
+        receiptUrl,
+        item.name,
+        item.amount,
+        item.currency
+      )
       .run();
+  }
+}
+
+// A refund (full or partial) updates every order row that came from the
+// same charge — a combined checkout's line items share one payment_intent,
+// so a single refund event applies to all of them alike. There's no
+// per-line-item refund data from Stripe to split it further.
+async function handleChargeRefunded(charge, env) {
+  const paymentIntentId = charge.payment_intent;
+  if (!paymentIntentId) return;
+
+  const status = charge.amount_refunded >= charge.amount ? "refunded" : "partially_refunded";
+  await env.DB.prepare("UPDATE orders SET status = ?, refunded_amount = ? WHERE payment_intent_id = ?")
+    .bind(status, charge.amount_refunded, paymentIntentId)
+    .run();
+}
+
+async function handleStripeWebhook(request, env) {
+  const payload = await request.text();
+  const sig = request.headers.get("Stripe-Signature");
+  const valid = await verifyStripeSignature(payload, sig, env.STRIPE_WEBHOOK_SECRET);
+  if (!valid) return new Response("Invalid signature", { status: 400 });
+
+  const event = JSON.parse(payload);
+  if (event.type === "checkout.session.completed") {
+    await handleCheckoutCompleted(event.data.object, env);
+  } else if (event.type === "charge.refunded") {
+    await handleChargeRefunded(event.data.object, env);
   }
 
   return jsonResponse({ received: true });

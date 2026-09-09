@@ -1,9 +1,8 @@
-# Customer accounts — go-live checklist
+# Customer accounts — setup reference
 
-Everything below is written and committed but **not deployed and not linked
-from the site**. `account.html` currently just shows "Accounts aren't
-switched on yet" to any visitor who finds it directly. Follow these steps
-when you're ready to turn it on.
+This is **live** — deployed, tested, and linked from the site nav. This
+doc is kept as a reference for how it's wired up and what to do if you
+ever need to redeploy the Worker or database from scratch.
 
 ## What this adds
 
@@ -32,6 +31,10 @@ when you're ready to turn it on.
   - Orders are populated automatically by a Stripe webhook when a payment
     completes — you never enter them by hand, and there's nothing to keep
     in sync with `products.js`
+  - Each order stores its Stripe receipt URL (shown as a "Receipt" link)
+    and payment_intent id; a later refund on that payment (full or partial)
+    is picked up by a second webhook event and updates the order's status
+    to `refunded` or `partially_refunded` automatically — see step 7
   - Return requests are stored per order, raised by the buyer from their
     account page — see "Reviewing return requests" below for how you see
     and action them (there's no seller-facing admin page yet)
@@ -81,7 +84,10 @@ when you're ready to turn it on.
    [Stripe Dashboard → Developers → Webhooks](https://dashboard.stripe.com/webhooks),
    add an endpoint:
    - URL: `https://<your-accounts-worker-url>/api/stripe-webhook`
-   - Event to send: `checkout.session.completed`
+   - Events to send: **both** `checkout.session.completed` (creates the
+     order) and `charge.refunded` (updates its status on a refund) — if the
+     destination already exists with only the first event selected, edit it
+     and add the second rather than creating a new destination
    - Stripe will show a **Signing secret** (`whsec_...`) — that's the
      `STRIPE_WEBHOOK_SECRET` from step 6
 
@@ -132,6 +138,24 @@ webhook not registered) before a real buyer hits it.
   confirm it also sees the "please verify" banner with no orders, even if
   you never click that link — this is the check that the email-ownership
   gap is actually closed
+
+## Migrating an existing database (receipts + refund status)
+
+If your D1 database was created before receipts/refund-status support was
+added, `schema.sql`'s `CREATE TABLE IF NOT EXISTS` won't add the new
+columns to an already-existing `orders` table. Run this once in the D1
+**Console** tab for `gradedcards01-accounts`:
+
+```sql
+ALTER TABLE orders ADD COLUMN payment_intent_id TEXT;
+ALTER TABLE orders ADD COLUMN receipt_url TEXT;
+ALTER TABLE orders ADD COLUMN refunded_amount INTEGER NOT NULL DEFAULT 0;
+CREATE INDEX IF NOT EXISTS idx_orders_payment_intent ON orders(payment_intent_id);
+```
+
+Orders recorded before this migration will simply have no receipt link and
+can't have their refund status auto-synced (their `payment_intent_id` is
+NULL) — only new orders going forward get both.
 
 ## Reviewing return requests
 
