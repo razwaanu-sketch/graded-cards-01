@@ -26,9 +26,17 @@
 // Return requests (POST /api/returns) are buyer-raised and stored as a
 // system of record, but there's no seller-facing admin page yet — see
 // ACCOUNTS-SETUP.md for how to review and action them via the D1 console.
+//
+// Email verification and password reset are sent via Resend (env.RESEND_API_KEY,
+// env.EMAIL_FROM). Order history and return requests are withheld until an
+// address is verified — otherwise signing up with someone else's real email
+// would immediately expose their order history, since orders are matched
+// purely by email address.
 
 const SITE_ORIGIN = "https://www.gradedcards01.com";
 const SESSION_DAYS = 30;
+const VERIFY_TOKEN_HOURS = 24;
+const RESET_TOKEN_HOURS = 1;
 
 function corsHeaders() {
   return {
@@ -111,7 +119,7 @@ async function getUserFromRequest(request, env) {
   if (!token) return null;
 
   const row = await env.DB.prepare(
-    `SELECT users.id, users.email FROM sessions
+    `SELECT users.id, users.email, users.email_verified FROM sessions
      JOIN users ON users.id = sessions.user_id
      WHERE sessions.token_hash = ? AND sessions.expires_at > datetime('now')`
   )
@@ -128,6 +136,60 @@ async function createSession(env, userId) {
     .bind(await hashToken(token), userId)
     .run();
   return token;
+}
+
+// Sends via Resend's REST API. Failures are swallowed by callers (a signup
+// or reset request should still succeed even if the email provider is
+// briefly down) — see the comment at each call site.
+async function sendEmail(env, { to, subject, html, text }) {
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ from: env.EMAIL_FROM, to, subject, html, text }),
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Resend API error ${res.status}: ${body}`);
+  }
+}
+
+// Creates a single-use, time-limited token for either email purpose,
+// storing only its hash (same reasoning as session tokens). Returns the
+// raw token to embed in the emailed link.
+async function createEmailToken(env, userId, purpose, hours) {
+  const token = generateToken();
+  await env.DB.prepare(
+    `INSERT INTO email_tokens (token_hash, user_id, purpose, expires_at)
+     VALUES (?, ?, ?, datetime('now', '+${hours} hours'))`
+  )
+    .bind(await hashToken(token), userId, purpose)
+    .run();
+  return token;
+}
+
+async function sendVerificationEmail(env, userId, email) {
+  const token = await createEmailToken(env, userId, "verify", VERIFY_TOKEN_HOURS);
+  const link = `${SITE_ORIGIN}/account.html?verify=${token}`;
+  await sendEmail(env, {
+    to: email,
+    subject: "Verify your email — Graded Cards 01",
+    text: `Verify your email to activate your Graded Cards 01 account: ${link}\n\nThis link expires in ${VERIFY_TOKEN_HOURS} hours.`,
+    html: `<p>Verify your email to activate your Graded Cards 01 account:</p><p><a href="${link}">${link}</a></p><p>This link expires in ${VERIFY_TOKEN_HOURS} hours.</p>`,
+  });
+}
+
+async function sendPasswordResetEmail(env, userId, email) {
+  const token = await createEmailToken(env, userId, "reset", RESET_TOKEN_HOURS);
+  const link = `${SITE_ORIGIN}/account.html?reset=${token}`;
+  await sendEmail(env, {
+    to: email,
+    subject: "Reset your password — Graded Cards 01",
+    text: `Reset your Graded Cards 01 password: ${link}\n\nThis link expires in ${RESET_TOKEN_HOURS} hour and can only be used once. If you didn't request this, you can ignore this email.`,
+    html: `<p>Reset your Graded Cards 01 password:</p><p><a href="${link}">${link}</a></p><p>This link expires in ${RESET_TOKEN_HOURS} hour and can only be used once. If you didn't request this, you can ignore this email.</p>`,
+  });
 }
 
 async function handleSignup(request, env) {
@@ -147,9 +209,19 @@ async function handleSignup(request, env) {
   )
     .bind(email, hash, salt)
     .run();
+  const userId = result.meta.last_row_id;
 
-  const token = await createSession(env, result.meta.last_row_id);
-  return jsonResponse({ token, email });
+  const token = await createSession(env, userId);
+
+  // A signup should succeed even if the email provider hiccups — the
+  // account still works, and "Resend verification email" covers the retry.
+  try {
+    await sendVerificationEmail(env, userId, email);
+  } catch (e) {
+    // swallow — verification email is a courtesy, not a signup requirement
+  }
+
+  return jsonResponse({ token, email, email_verified: false });
 }
 
 async function handleLogin(request, env) {
@@ -208,6 +280,16 @@ async function handleMe(request, env) {
   const user = await getUserFromRequest(request, env);
   if (!user) return jsonResponse({ error: "Not signed in." }, 401);
 
+  const emailVerified = !!user.email_verified;
+
+  // Order history and returns are only ever matched by email — without
+  // requiring proof of ownership first, anyone could sign up with someone
+  // else's email and immediately see (and file returns against) their real
+  // orders. Withholding both until the address is verified closes that.
+  if (!emailVerified) {
+    return jsonResponse({ email: user.email, email_verified: false, orders: [] });
+  }
+
   const { results } = await env.DB.prepare(
     `SELECT o.id AS order_id, o.product_id, o.product_name, o.amount, o.currency, o.status,
             o.stripe_session_id, o.created_at,
@@ -220,12 +302,96 @@ async function handleMe(request, env) {
     .bind(user.email)
     .all();
 
-  return jsonResponse({ email: user.email, orders: results || [] });
+  return jsonResponse({ email: user.email, email_verified: true, orders: results || [] });
+}
+
+async function handleVerifyEmail(request, env) {
+  const body = await request.json().catch(() => ({}));
+  const token = body.token || "";
+  if (!token) return jsonResponse({ error: "Missing verification token." }, 400);
+
+  const row = await env.DB.prepare(
+    "SELECT user_id FROM email_tokens WHERE token_hash = ? AND purpose = 'verify' AND expires_at > datetime('now')"
+  )
+    .bind(await hashToken(token))
+    .first();
+  if (!row) return jsonResponse({ error: "This verification link is invalid or has expired." }, 400);
+
+  await env.DB.prepare("UPDATE users SET email_verified = 1 WHERE id = ?").bind(row.user_id).run();
+  await env.DB.prepare("DELETE FROM email_tokens WHERE user_id = ? AND purpose = 'verify'").bind(row.user_id).run();
+
+  return jsonResponse({ ok: true });
+}
+
+async function handleResendVerification(request, env) {
+  const user = await getUserFromRequest(request, env);
+  if (!user) return jsonResponse({ error: "Not signed in." }, 401);
+  if (user.email_verified) return jsonResponse({ error: "Your email is already verified." }, 400);
+
+  await env.DB.prepare("DELETE FROM email_tokens WHERE user_id = ? AND purpose = 'verify'").bind(user.id).run();
+  try {
+    await sendVerificationEmail(env, user.id, user.email);
+  } catch (e) {
+    return jsonResponse({ error: "Could not send email right now — please try again shortly." }, 502);
+  }
+  return jsonResponse({ ok: true });
+}
+
+async function handleRequestPasswordReset(request, env) {
+  const body = await request.json().catch(() => ({}));
+  const email = (body.email || "").trim().toLowerCase();
+
+  // Always the same response whether or not the email has an account, so
+  // this endpoint can't be used to discover registered addresses.
+  const genericResponse = jsonResponse({
+    ok: true,
+    message: "If that email has an account, we've sent a password reset link.",
+  });
+
+  if (!isValidEmail(email)) return genericResponse;
+  const user = await env.DB.prepare("SELECT id, email FROM users WHERE email = ?").bind(email).first();
+  if (!user) return genericResponse;
+
+  try {
+    await sendPasswordResetEmail(env, user.id, user.email);
+  } catch (e) {
+    // Still return the generic success response — don't leak provider
+    // failures to the client, and don't reveal account existence either.
+  }
+  return genericResponse;
+}
+
+async function handleResetPassword(request, env) {
+  const body = await request.json().catch(() => ({}));
+  const token = body.token || "";
+  const password = body.password || "";
+  if (!token) return jsonResponse({ error: "Missing reset token." }, 400);
+  if (password.length < 8) return jsonResponse({ error: "Password must be at least 8 characters." }, 400);
+
+  const row = await env.DB.prepare(
+    "SELECT user_id FROM email_tokens WHERE token_hash = ? AND purpose = 'reset' AND expires_at > datetime('now')"
+  )
+    .bind(await hashToken(token))
+    .first();
+  if (!row) return jsonResponse({ error: "This reset link is invalid or has expired." }, 400);
+
+  const { hash, salt } = await hashPassword(password);
+  await env.DB.prepare("UPDATE users SET password_hash = ?, password_salt = ? WHERE id = ?")
+    .bind(hash, salt, row.user_id)
+    .run();
+
+  // Force re-login everywhere — a password reset should invalidate any
+  // session that might exist on a device the account owner no longer trusts.
+  await env.DB.prepare("DELETE FROM sessions WHERE user_id = ?").bind(row.user_id).run();
+  await env.DB.prepare("DELETE FROM email_tokens WHERE user_id = ? AND purpose = 'reset'").bind(row.user_id).run();
+
+  return jsonResponse({ ok: true });
 }
 
 async function handleCreateReturn(request, env) {
   const user = await getUserFromRequest(request, env);
   if (!user) return jsonResponse({ error: "Not signed in." }, 401);
+  if (!user.email_verified) return jsonResponse({ error: "Please verify your email before requesting a return." }, 403);
 
   const body = await request.json().catch(() => ({}));
   const orderId = Number(body.order_id);
@@ -346,6 +512,13 @@ export default {
       if (url.pathname === "/api/logout" && request.method === "POST") return await handleLogout(request, env);
       if (url.pathname === "/api/me" && request.method === "GET") return await handleMe(request, env);
       if (url.pathname === "/api/returns" && request.method === "POST") return await handleCreateReturn(request, env);
+      if (url.pathname === "/api/verify-email" && request.method === "POST") return await handleVerifyEmail(request, env);
+      if (url.pathname === "/api/resend-verification" && request.method === "POST")
+        return await handleResendVerification(request, env);
+      if (url.pathname === "/api/request-password-reset" && request.method === "POST")
+        return await handleRequestPasswordReset(request, env);
+      if (url.pathname === "/api/reset-password" && request.method === "POST")
+        return await handleResetPassword(request, env);
       if (url.pathname === "/api/stripe-webhook" && request.method === "POST")
         return await handleStripeWebhook(request, env);
     } catch (e) {

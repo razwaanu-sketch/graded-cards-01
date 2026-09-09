@@ -7,8 +7,9 @@ when you're ready to turn it on.
 
 ## What this adds
 
-- `account.html` / `account.js` — sign up, log in, view order history, and
-  request a return on an order
+- `account.html` / `account.js` — sign up, log in, email verification,
+  forgot/reset password, view order history, and request a return on an
+  order
 - `accounts-worker/` — a Cloudflare Worker + D1 database backend:
   - Passwords are hashed (PBKDF2-SHA256, 100k iterations, random salt per
     user) — never stored in plain text
@@ -19,6 +20,15 @@ when you're ready to turn it on.
     stored in the database, never the raw value
   - Repeated failed logins for the same email get a growing lockout
     (1 min → 15 min → 1 hour) to blunt password guessing
+  - **Email verification is required before order history or returns are
+    visible.** Orders are matched purely by email address, so without this,
+    signing up with someone else's real email would immediately expose
+    their order history — verification closes that. A new signup gets a
+    verification email (via Resend) and sees a "please verify" banner
+    instead of their orders until they click the link.
+  - **Forgot/reset password** sends a one-time link (via Resend) that
+    expires in 1 hour and can only be used once; resetting a password logs
+    out every existing session on that account.
   - Orders are populated automatically by a Stripe webhook when a payment
     completes — you never enter them by hand, and there's nothing to keep
     in sync with `products.js`
@@ -34,8 +44,8 @@ when you're ready to turn it on.
 
 2. **Load the schema.** Open the new database → Console (or "Query") tab,
    paste in the contents of `accounts-worker/schema.sql`, and run it. This
-   creates the `users`, `sessions`, `orders`, `returns`, and
-   `login_attempts` tables.
+   creates the `users`, `sessions`, `orders`, `returns`, `login_attempts`,
+   and `email_tokens` tables.
 
 3. **Update `accounts-worker/wrangler.toml`.** Replace
    `REPLACE_WITH_D1_DATABASE_ID` with the Database ID from step 1, commit,
@@ -47,47 +57,81 @@ when you're ready to turn it on.
    - After it deploys, go to Domains and enable the `workers.dev` URL —
      note it down (e.g. `https://gradedcards01-accounts.<you>.workers.dev`)
 
-5. **Add secrets** under Settings → Variables and secrets (mark both as
-   type **Secret**):
-   - `STRIPE_SECRET_KEY` — same value as the checkout Worker
-   - `STRIPE_WEBHOOK_SECRET` — you'll get this in step 6
+5. **Set up Resend** (sends verification + password-reset emails):
+   - Sign up free at [resend.com](https://resend.com)
+   - **Add and verify a sending domain** (Domains → Add Domain — e.g.
+     `gradedcards01.com` or a subdomain like `mail.gradedcards01.com`) by
+     adding the DNS records it gives you at Namecheap, same idea as the
+     earlier HTTPS/DNS work. **Without a verified domain, Resend will only
+     deliver to your own signup email — verification/reset links won't
+     reach real buyers**, so this step isn't optional.
+   - Once verified, create an **API key** (API Keys → Create API Key)
+   - Decide a from-address using your verified domain, e.g.
+     `no-reply@gradedcards01.com`
 
-6. **Register the Stripe webhook.** In the
+6. **Add secrets** under the Worker's Settings → Variables and secrets
+   (mark all as type **Secret** except `EMAIL_FROM`, which can be plain
+   text since it's not sensitive):
+   - `STRIPE_SECRET_KEY` — same value as the checkout Worker
+   - `STRIPE_WEBHOOK_SECRET` — you'll get this in step 7
+   - `RESEND_API_KEY` — from step 5
+   - `EMAIL_FROM` — your verified from-address, e.g. `no-reply@gradedcards01.com`
+
+7. **Register the Stripe webhook.** In the
    [Stripe Dashboard → Developers → Webhooks](https://dashboard.stripe.com/webhooks),
    add an endpoint:
    - URL: `https://<your-accounts-worker-url>/api/stripe-webhook`
    - Event to send: `checkout.session.completed`
    - Stripe will show a **Signing secret** (`whsec_...`) — that's the
-     `STRIPE_WEBHOOK_SECRET` from step 5
+     `STRIPE_WEBHOOK_SECRET` from step 6
 
-7. **Wire the frontend.** In `account.js`, set:
+8. **Wire the frontend.** In `account.js`, set:
    ```js
    const ACCOUNTS_API = "https://<your-accounts-worker-url>";
    ```
 
-8. **Link it from the site.** Add an "Account" link to the `.nav-menu` in
+9. **Link it from the site.** Add an "Account" link to the `.nav-menu` in
    each HTML page (same pattern as Shop/About/Shipping/Contact), and/or a
    "My account" link near the cart icon.
 
-9. **Commit and push to `main`.** This is the point where it actually goes
-   live — everything before this step can be done safely without affecting
-   the live site.
+10. **Commit and push to `main`.** This is the point where it actually goes
+    live — everything before this step can be done safely without affecting
+    the live site.
 
 ## Testing before you announce it
 
-- Sign up with a real email you control, confirm you land on the
-  signed-in view with an empty order list
-- Make a real (or Stripe test-mode, if you switch keys temporarily) purchase
-  using that same email, and confirm the order appears after a refresh
+This is the full customer journey to walk through end to end once deployed
+— it'll surface any config issue (wrong secret, unverified Resend domain,
+webhook not registered) before a real buyer hits it.
+
+- **Sign up** with a real email you control → land on the signed-in view
+  with a "please verify your email" banner and no order history yet
+- Check that inbox for the verification email (check spam too) → click the
+  link → should land back on `account.html` showing "Your email is
+  verified" and the (empty) order history section
 - Try signing up twice with the same email — should show "An account with
   that email already exists."
+- **Log out, log back in** with the same email/password — confirm the
+  order history (now empty) still loads correctly
 - Try logging in with a wrong password — should show a generic "Incorrect
   email or password" (never reveal whether the email exists)
 - Try logging in with a wrong password 5+ times in a row — should start
   returning "Too many failed attempts" instead of continuing to guess
-- On a real order, tap "Request a return," submit a reason, confirm it
+- Tap **"Forgot your password?"** → enter your email → confirm the generic
+  "If that email has an account…" message appears regardless of whether
+  you typed a real or made-up email → check your inbox for the reset email
+  → click it → set a new password → confirm you're prompted to log in
+  again (old sessions are invalidated) and the new password works
+- Make a real (or Stripe test-mode, if you switch keys temporarily)
+  purchase using your verified email, and confirm the order appears in
+  your account after a refresh
+- On that order, tap **"Request a return,"** submit a reason, confirm it
   shows "Return: requested" afterwards and the button doesn't reappear;
-  confirm the row shows up via the D1 console query above
+  confirm the row shows up via the D1 console query below
+- **Sign up with a second, different email you don't intend to verify** →
+  confirm it also sees the "please verify" banner with no orders, even if
+  you never click that link — this is the check that the email-ownership
+  gap is actually closed
 
 ## Reviewing return requests
 
@@ -107,24 +151,20 @@ ORDER BY r.requested_at DESC;
 UPDATE returns SET status = 'approved', updated_at = datetime('now') WHERE id = ?;
 ```
 
-Once you're checking this regularly, worth adding: an email notification to
-you when a new return comes in, and a status update email to the buyer —
-both need a transactional email provider (see below), so they're grouped
-with that decision rather than built blind.
+Now that Resend is wired in for verification/reset emails, worth adding
+next: a notification to you when a new return comes in, and a status
+update email to the buyer when you approve/reject one — both are small
+additions to `handleCreateReturn` and the D1 update query above, using the
+same `sendEmail` helper already in `worker.js`.
 
 ## Known limitations (fine for a shop this size, worth knowing)
 
-- No "forgot password" flow yet, and no email notification when a return
-  request comes in or changes status — both need a transactional email
-  provider (e.g. SendGrid, Mailgun, Postmark) wired into the Worker, which
-  is a new external service account + API key, so it's a deliberate next
-  step rather than something built without checking first. Say the word
-  and we can set one up the same way we did Stripe/GA4.
-- No email verification on signup — someone could sign up with an email
-  they don't own; low-stakes here since accounts only ever *display* order
-  history and raise return requests, they don't grant any purchasing power
 - Session tokens don't auto-refresh; they simply expire after 30 days and
   the user has to log in again
 - No seller-facing admin page for returns (see "Reviewing return requests"
   above) — reasonable for the current volume, worth building once there's
   enough return traffic to make the D1 console tedious
+- No notification email to you when a return is requested, or to the buyer
+  when its status changes — see the note just above
+- Password reset links are single-use and expire in 1 hour; verification
+  links expire in 24 hours (resend from the account page if it lapses)

@@ -24,6 +24,17 @@
   const logoutBtn = document.getElementById("logout-btn");
   const orderListEl = document.getElementById("order-list");
   const orderEmptyEl = document.getElementById("order-empty");
+  const accountTabsEl = document.querySelector(".account-tabs");
+  const forgotLink = document.getElementById("forgot-password-link");
+  const forgotForm = document.getElementById("forgot-password-form");
+  const backToLoginLink = document.getElementById("back-to-login-link");
+  const resetSectionEl = document.getElementById("reset-password-section");
+  const resetForm = document.getElementById("reset-password-form");
+  const noticeEl = document.getElementById("account-notice");
+  const verifyBannerEl = document.getElementById("verify-banner");
+  const resendBtn = document.getElementById("resend-verification-btn");
+  const orderSectionEl = document.getElementById("order-section");
+  let currentResetToken = "";
 
   function getToken() {
     try {
@@ -64,6 +75,24 @@
     });
     loginForm.hidden = tab !== "login";
     signupForm.hidden = tab !== "signup";
+  }
+
+  function showNotice(message) {
+    noticeEl.textContent = message;
+    noticeEl.hidden = !message;
+  }
+
+  function showForgotPasswordForm() {
+    accountTabsEl.hidden = true;
+    loginForm.hidden = true;
+    signupForm.hidden = true;
+    forgotForm.hidden = false;
+  }
+
+  function showLoginTabs() {
+    forgotForm.hidden = true;
+    accountTabsEl.hidden = false;
+    switchTab("login");
   }
 
   function renderOrders(orders) {
@@ -138,6 +167,7 @@
   }
 
   async function loadAccount() {
+    resetSectionEl.hidden = true;
     const token = getToken();
     if (!token) {
       signedOutEl.hidden = false;
@@ -149,7 +179,9 @@
       if (!res.ok) throw new Error("session invalid");
       const data = await res.json();
       emailEl.textContent = data.email;
-      renderOrders(data.orders || []);
+      verifyBannerEl.hidden = !!data.email_verified;
+      orderSectionEl.hidden = !data.email_verified;
+      if (data.email_verified) renderOrders(data.orders || []);
       signedInEl.hidden = false;
       signedOutEl.hidden = true;
     } catch (e) {
@@ -157,6 +189,37 @@
       signedOutEl.hidden = false;
       signedInEl.hidden = true;
     }
+  }
+
+  async function handleVerifyAndResetParams() {
+    const params = new URLSearchParams(window.location.search);
+    const verifyToken = params.get("verify");
+    const resetToken = params.get("reset");
+
+    if (verifyToken) {
+      try {
+        const res = await fetch(`${ACCOUNTS_API}/api/verify-email`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: verifyToken }),
+        });
+        const data = await res.json();
+        showNotice(res.ok ? "Your email is verified." : data.error || "That verification link is invalid or has expired.");
+      } catch (e) {
+        showNotice("Could not verify your email — please try again.");
+      }
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+
+    if (resetToken) {
+      currentResetToken = resetToken;
+      resetSectionEl.hidden = false;
+      signedOutEl.hidden = true;
+      signedInEl.hidden = true;
+      window.history.replaceState({}, "", window.location.pathname);
+      return true;
+    }
+    return false;
   }
 
   document.querySelectorAll(".account-tab").forEach((btn) => {
@@ -218,5 +281,84 @@
     }
   });
 
-  document.addEventListener("DOMContentLoaded", loadAccount);
+  forgotLink.addEventListener("click", () => {
+    showNotice("");
+    showForgotPasswordForm();
+  });
+  backToLoginLink.addEventListener("click", showLoginTabs);
+
+  forgotForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    showError(forgotForm, "");
+    const email = document.getElementById("forgot-password-email").value;
+    const btn = forgotForm.querySelector("button[type='submit']");
+    btn.disabled = true;
+    try {
+      const res = await fetch(`${ACCOUNTS_API}/api/request-password-reset`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      forgotForm.reset();
+      showLoginTabs();
+      showNotice(data.message || "If that email has an account, we've sent a password reset link.");
+    } catch (err) {
+      showError(forgotForm, "Something went wrong — please try again.");
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  resetForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    showError(resetForm, "");
+    const password = document.getElementById("reset-password-new").value;
+    const btn = resetForm.querySelector("button[type='submit']");
+    btn.disabled = true;
+    try {
+      const res = await fetch(`${ACCOUNTS_API}/api/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: currentResetToken, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not reset password.");
+      resetForm.reset();
+      resetSectionEl.hidden = true;
+      signedOutEl.hidden = false;
+      showLoginTabs();
+      showNotice("Password updated — please log in below.");
+    } catch (err) {
+      showError(resetForm, err.message);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  resendBtn.addEventListener("click", async () => {
+    const errEl = verifyBannerEl.querySelector(".account-error");
+    errEl.hidden = true;
+    resendBtn.disabled = true;
+    resendBtn.textContent = "Sending…";
+    try {
+      const res = await fetch(`${ACCOUNTS_API}/api/resend-verification`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not resend email.");
+      resendBtn.textContent = "Sent!";
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.hidden = false;
+      resendBtn.disabled = false;
+      resendBtn.textContent = "Resend verification email";
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    const showingReset = await handleVerifyAndResetParams();
+    if (!showingReset) loadAccount();
+  });
 })();
