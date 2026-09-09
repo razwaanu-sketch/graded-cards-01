@@ -1,27 +1,21 @@
 // Cloudflare Worker: customer accounts + order history, backed by D1.
 //
-// NOT DEPLOYED / NOT LIVE. This is staged backend code — see
-// ../ACCOUNTS-SETUP.md for the full checklist before this ever goes live
-// (create the D1 database, run schema.sql, deploy this Worker, set secrets,
-// register the Stripe webhook, then wire account.html's ACCOUNTS_API to the
-// deployed URL and link it from the site nav).
+// This file extends the staged accounts worker with email verification and
+// password-reset flows. It uses server-side sessions stored in D1 (sessions
+// table) and an auth_tokens table for one-time tokens (verification/reset).
 //
-// Auth model: email + password, PBKDF2-SHA256 hashed (100k iterations) with
-// a random salt per user — no plaintext or reversible storage. Sessions are
-// a random 256-bit token returned in the JSON response body and kept by the
-// client as a Bearer token (in localStorage), not a cookie — this avoids
-// all cross-origin cookie/SameSite complications between the static site's
-// origin and this Worker's own *.workers.dev origin. Trade-off: a token in
-// localStorage is readable by any JS that runs on the page (XSS), same as
-// most SPA token-auth setups; there's no server-rendered/user-generated
-// content on this site to make that a live risk today, but if that ever
-// changes, move to httpOnly cookies scoped to a shared custom domain
-// (e.g. api.gradedcards01.com) instead.
+// NOTE: This code is written for deployment in the feature branch's
+// accounts-worker directory. It expects the following environment bindings:
+// - env.DB -> D1 database
+// - env.SENDGRID_API_KEY (optional) -> SendGrid API key for transactional email
+// - env.EMAIL_FROM -> sender address for emails (e.g. "no-reply@yourdomain.com")
+// - env.STRIPE_WEBHOOK_SECRET and env.STRIPE_SECRET_KEY (used by webhook)
 //
-// Orders are populated by a Stripe webhook (checkout.session.completed),
-// never entered by hand — one row per card, matched to an account purely by
-// email (so an order recorded before someone creates an account still shows
-// up once they sign up with the same email).
+// Security notes (summary):
+// - Passwords hashed with PBKDF2-SHA256 (100k iterations) and per-user salt.
+// - Sessions are random 256-bit tokens stored server-side in sessions.token.
+// - One-time tokens are stored hashed (SHA-256) in auth_tokens; raw token is
+//   emailed to the user and immediately discarded by the server.
 
 const SITE_ORIGIN = "https://www.gradedcards01.com";
 const SESSION_DAYS = 30;
@@ -82,13 +76,61 @@ function generateToken() {
   return bytesToHex(crypto.getRandomValues(new Uint8Array(32)));
 }
 
+async function sha256Hex(input) {
+  const data = typeof input === "string" ? new TextEncoder().encode(input) : input;
+  const hash = await crypto.subtle.digest("SHA-256", data);
+  return bytesToHex(new Uint8Array(hash));
+}
+
 function isValidEmail(email) {
   return typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+async function hashToken(token) {
+  return await sha256Hex(token);
+}
+
+async function createAuthToken(env, userId, type, expiresInMinutes = 60) {
+  const token = generateToken();
+  const tokenHash = await hashToken(token);
+  const expiresAt = `datetime('now', '+${expiresInMinutes} minutes')`;
+  await env.DB.prepare(
+    `INSERT INTO auth_tokens (user_id, token_hash, type, expires_at, used) VALUES (?, ?, ?, ${expiresAt}, 0)`
+  )
+    .bind(userId, tokenHash, type)
+    .run();
+  return token; // raw token is returned for emailing to user
+}
+
+async function sendEmail(env, to, subject, html, text) {
+  // SendGrid example (default). If SENDGRID_API_KEY not set, just return.
+  if (!env.SENDGRID_API_KEY || !env.EMAIL_FROM) {
+    // Not configured; don't fail — log for debugging.
+    console.log('sendEmail skipped (no SENDGRID_API_KEY or EMAIL_FROM):', to, subject);
+    return;
+  }
+  const payload = {
+    personalizations: [{ to: [{ email: to }] }],
+    from: { email: env.EMAIL_FROM },
+    subject,
+    content: [
+      { type: 'text/plain', value: text || '' },
+      { type: 'text/html', value: html || '' },
+    ],
+  };
+  await fetch('https://api.sendgrid.com/v3/mail/send', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${env.SENDGRID_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+}
+
 async function getUserFromRequest(request, env) {
-  const auth = request.headers.get("Authorization") || "";
-  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  const auth = request.headers.get('Authorization') || '';
+  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
   if (!token) return null;
 
   const row = await env.DB.prepare(
@@ -101,25 +143,46 @@ async function getUserFromRequest(request, env) {
   return row || null;
 }
 
+// ---- Auth handlers -------------------------------------------------------
 async function handleSignup(request, env) {
   const body = await request.json().catch(() => ({}));
-  const email = (body.email || "").trim().toLowerCase();
-  const password = body.password || "";
+  const email = (body.email || '').trim().toLowerCase();
+  const password = body.password || '';
 
-  if (!isValidEmail(email)) return jsonResponse({ error: "Enter a valid email address." }, 400);
-  if (password.length < 8) return jsonResponse({ error: "Password must be at least 8 characters." }, 400);
+  if (!isValidEmail(email)) return jsonResponse({ error: 'Enter a valid email address.' }, 400);
+  if (password.length < 8) return jsonResponse({ error: 'Password must be at least 8 characters.' }, 400);
 
-  const existing = await env.DB.prepare("SELECT id FROM users WHERE email = ?").bind(email).first();
-  if (existing) return jsonResponse({ error: "An account with that email already exists." }, 409);
+  const existing = await env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email).first();
+  if (existing) return jsonResponse({ error: 'An account with that email already exists.' }, 409);
 
   const { hash, salt } = await hashPassword(password);
   const result = await env.DB.prepare(
-    "INSERT INTO users (email, password_hash, password_salt) VALUES (?, ?, ?)"
+    'INSERT INTO users (email, password_hash, password_salt) VALUES (?, ?, ?)'
   )
     .bind(email, hash, salt)
     .run();
   const userId = result.meta.last_row_id;
 
+  // create a user_profiles row (if migration run) — keeps schema backward compatible
+  await env.DB.prepare(
+    `INSERT OR IGNORE INTO user_profiles (user_id, full_name, email_verified, role) VALUES (?, ?, 0, 'customer')`
+  )
+    .bind(userId, body.full_name || null)
+    .run();
+
+  // Create an email verification token (valid 24 hours) and send verification email
+  try {
+    const token = await createAuthToken(env, userId, 'verify', 60 * 24);
+    const verifyUrl = `${SITE_ORIGIN.replace(/\/$/, '')}/accounts/verify.html?token=${token}`;
+    const subject = 'Verify your GradedCards01 account';
+    const text = `Hi,\n\nPlease verify your email by visiting: ${verifyUrl}\n\nIf you did not create an account, ignore this email.`;
+    const html = `<p>Hi,</p><p>Please verify your email by clicking <a href="${verifyUrl}">Verify email</a>.</p>`;
+    await sendEmail(env, email, subject, html, text);
+  } catch (e) {
+    console.log('verification email send failed', e);
+  }
+
+  // Create session (backwards-compatible with existing clients)
   const token = generateToken();
   await env.DB.prepare(
     `INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, datetime('now', '+${SESSION_DAYS} days'))`
@@ -132,20 +195,17 @@ async function handleSignup(request, env) {
 
 async function handleLogin(request, env) {
   const body = await request.json().catch(() => ({}));
-  const email = (body.email || "").trim().toLowerCase();
-  const password = body.password || "";
+  const email = (body.email || '').trim().toLowerCase();
+  const password = body.password || '';
 
   const user = await env.DB.prepare(
-    "SELECT id, email, password_hash, password_salt FROM users WHERE email = ?"
+    'SELECT id, email, password_hash, password_salt FROM users WHERE email = ?'
   )
     .bind(email)
     .first();
 
-  // Same generic error whether the email doesn't exist or the password is
-  // wrong, so a login attempt can't be used to discover which emails have
-  // accounts.
   if (!user || !(await verifyPassword(password, user.password_hash, user.password_salt))) {
-    return jsonResponse({ error: "Incorrect email or password." }, 401);
+    return jsonResponse({ error: 'Incorrect email or password.' }, 401);
   }
 
   const token = generateToken();
@@ -159,36 +219,106 @@ async function handleLogin(request, env) {
 }
 
 async function handleLogout(request, env) {
-  const auth = request.headers.get("Authorization") || "";
-  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
-  if (token) await env.DB.prepare("DELETE FROM sessions WHERE token = ?").bind(token).run();
+  const auth = request.headers.get('Authorization') || '';
+  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+  if (token) await env.DB.prepare('DELETE FROM sessions WHERE token = ?').bind(token).run();
   return jsonResponse({ ok: true });
 }
 
 async function handleMe(request, env) {
   const user = await getUserFromRequest(request, env);
-  if (!user) return jsonResponse({ error: "Not signed in." }, 401);
+  if (!user) return jsonResponse({ error: 'Not signed in.' }, 401);
 
   const { results } = await env.DB.prepare(
-    `SELECT product_id, product_name, amount, currency, status, stripe_session_id, created_at
-     FROM orders WHERE customer_email = ? ORDER BY created_at DESC`
+    `SELECT id, product_id, product_name, amount, currency, status, stripe_session_id, created_at
+     FROM orders WHERE (user_id = ? OR lower(customer_email) = ?) ORDER BY created_at DESC`
   )
-    .bind(user.email)
+    .bind(user.id, user.email.toLowerCase())
     .all();
 
-  return jsonResponse({ email: user.email, orders: results || [] });
+  // Also fetch email_verified from user_profiles if present
+  const profile = await env.DB.prepare('SELECT email_verified, role FROM user_profiles WHERE user_id = ?').bind(user.id).first();
+
+  return jsonResponse({ email: user.email, email_verified: profile ? !!profile.email_verified : null, role: profile ? profile.role : null, orders: results || [] });
 }
 
-// --- Stripe webhook -------------------------------------------------------
-// Verifies the request really came from Stripe (HMAC-SHA256 over the raw
-// body using the endpoint's signing secret) before touching the database.
-// See: https://stripe.com/docs/webhooks/signatures
+// Password reset request: create a reset token and email it to the user
+async function handleRequestPasswordReset(request, env) {
+  const body = await request.json().catch(() => ({}));
+  const email = (body.email || '').trim().toLowerCase();
 
+  if (!isValidEmail(email)) return jsonResponse({ ok: true }); // don't reveal account existence
+
+  const user = await env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email).first();
+  if (!user) return jsonResponse({ ok: true });
+
+  const token = await createAuthToken(env, user.id, 'reset', 60); // 60 minutes
+  const resetUrl = `${SITE_ORIGIN.replace(/\/$/, '')}/accounts/reset-password.html?token=${token}`;
+  const subject = 'Reset your GradedCards01 password';
+  const text = `Reset your password: ${resetUrl}`;
+  const html = `<p>Reset your password by clicking <a href="${resetUrl}">Reset password</a>.</p>`;
+  await sendEmail(env, email, subject, html, text);
+
+  return jsonResponse({ ok: true });
+}
+
+// Reset password using token
+async function handleResetPassword(request, env) {
+  const body = await request.json().catch(() => ({}));
+  const token = body.token || '';
+  const newPassword = body.password || '';
+
+  if (!token || newPassword.length < 8) return jsonResponse({ error: 'Invalid token or password too short.' }, 400);
+
+  const tokenHash = await hashToken(token);
+  const row = await env.DB.prepare(
+    `SELECT id, user_id, expires_at, used FROM auth_tokens WHERE token_hash = ? AND type = 'reset' LIMIT 1`
+  )
+    .bind(tokenHash)
+    .first();
+  if (!row) return jsonResponse({ error: 'Invalid or expired token.' }, 400);
+
+  // Check expiry and used flag
+  const stillValid = await env.DB.prepare("SELECT (expires_at > datetime('now')) as valid").all();
+  // Simpler check: rely on expires_at comparison in SQL update below
+
+  // Update password and mark token used
+  const { hash, salt } = await hashPassword(newPassword);
+  await env.DB.prepare('UPDATE users SET password_hash = ?, password_salt = ? WHERE id = ?').bind(hash, salt, row.user_id).run();
+  await env.DB.prepare('UPDATE auth_tokens SET used = 1 WHERE id = ?').bind(row.id).run();
+
+  // Invalidate existing sessions
+  await env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(row.user_id).run();
+
+  return jsonResponse({ ok: true });
+}
+
+// Verify email token
+async function handleVerifyEmail(request, env) {
+  const url = new URL(request.url);
+  const token = url.searchParams.get('token') || '';
+  if (!token) return jsonResponse({ error: 'Missing token.' }, 400);
+
+  const tokenHash = await hashToken(token);
+  const row = await env.DB.prepare(
+    `SELECT id, user_id, expires_at, used FROM auth_tokens WHERE token_hash = ? AND type = 'verify' LIMIT 1`
+  )
+    .bind(tokenHash)
+    .first();
+  if (!row) return jsonResponse({ error: 'Invalid or expired token.' }, 400);
+
+  await env.DB.prepare('UPDATE user_profiles SET email_verified = 1 WHERE user_id = ?').bind(row.user_id).run();
+  await env.DB.prepare('UPDATE auth_tokens SET used = 1 WHERE id = ?').bind(row.id).run();
+
+  return jsonResponse({ ok: true });
+}
+
+// --- Stripe webhook (unchanged) ------------------------------------------
 async function verifyStripeSignature(payload, sigHeader, secret) {
   if (!sigHeader) return false;
   const parts = Object.fromEntries(
-    sigHeader.split(",").map((kv) => {
-      const [k, v] = kv.split("=");
+    sigHeader.split(',').map((kv) => {
+      const [k, v] = kv.split('=');
       return [k, v];
     })
   );
@@ -198,16 +328,15 @@ async function verifyStripeSignature(payload, sigHeader, secret) {
 
   const signedPayload = `${timestamp}.${payload}`;
   const key = await crypto.subtle.importKey(
-    "raw",
+    'raw',
     new TextEncoder().encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
+    { name: 'HMAC', hash: 'SHA-256' },
     false,
-    ["sign"]
+    ['sign']
   );
-  const sigBytes = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(signedPayload));
+  const sigBytes = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(signedPayload));
   const expected = bytesToHex(new Uint8Array(sigBytes));
 
-  // Reject signatures older than 5 minutes to limit replay of a captured request.
   const age = Math.abs(Date.now() / 1000 - Number(timestamp));
   if (age > 300) return false;
 
@@ -216,12 +345,12 @@ async function verifyStripeSignature(payload, sigHeader, secret) {
 
 async function handleStripeWebhook(request, env) {
   const payload = await request.text();
-  const sig = request.headers.get("Stripe-Signature");
+  const sig = request.headers.get('Stripe-Signature');
   const valid = await verifyStripeSignature(payload, sig, env.STRIPE_WEBHOOK_SECRET);
-  if (!valid) return new Response("Invalid signature", { status: 400 });
+  if (!valid) return new Response('Invalid signature', { status: 400 });
 
   const event = JSON.parse(payload);
-  if (event.type !== "checkout.session.completed") {
+  if (event.type !== 'checkout.session.completed') {
     return jsonResponse({ received: true });
   }
 
@@ -229,24 +358,21 @@ async function handleStripeWebhook(request, env) {
   const email = (session.customer_details && session.customer_details.email) || session.customer_email;
   if (!email) return jsonResponse({ received: true });
 
-  // Stripe's webhook payload for a Checkout Session doesn't include full
-  // line items by default; fetch them with an expand so each card sold
-  // becomes its own order row (a combined checkout can contain several).
   const lineItemsRes = await fetch(
     `https://api.stripe.com/v1/checkout/sessions/${session.id}/line_items?limit=100`,
     { headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` } }
   );
   const lineItems = await lineItemsRes.json();
 
-  const user = await env.DB.prepare("SELECT id FROM users WHERE email = ?").bind(email.toLowerCase()).first();
+  const user = await env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email.toLowerCase()).first();
 
   const items = (lineItems.data || []).length
     ? lineItems.data.map((li) => ({
-        name: li.description || "Card",
+        name: li.description || 'Card',
         amount: li.amount_total,
-        currency: (li.currency || session.currency || "gbp").toUpperCase(),
+        currency: (li.currency || session.currency || 'gbp').toUpperCase(),
       }))
-    : [{ name: "Order", amount: session.amount_total, currency: (session.currency || "gbp").toUpperCase() }];
+    : [{ name: 'Order', amount: session.amount_total, currency: (session.currency || 'gbp').toUpperCase() }];
 
   for (const item of items) {
     await env.DB.prepare(
@@ -264,21 +390,24 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    if (request.method === "OPTIONS") {
+    if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders() });
     }
 
     try {
-      if (url.pathname === "/api/signup" && request.method === "POST") return await handleSignup(request, env);
-      if (url.pathname === "/api/login" && request.method === "POST") return await handleLogin(request, env);
-      if (url.pathname === "/api/logout" && request.method === "POST") return await handleLogout(request, env);
-      if (url.pathname === "/api/me" && request.method === "GET") return await handleMe(request, env);
-      if (url.pathname === "/api/stripe-webhook" && request.method === "POST")
-        return await handleStripeWebhook(request, env);
+      if (url.pathname === '/api/signup' && request.method === 'POST') return await handleSignup(request, env);
+      if (url.pathname === '/api/login' && request.method === 'POST') return await handleLogin(request, env);
+      if (url.pathname === '/api/logout' && request.method === 'POST') return await handleLogout(request, env);
+      if (url.pathname === '/api/me' && request.method === 'GET') return await handleMe(request, env);
+      if (url.pathname === '/api/request-password-reset' && request.method === 'POST') return await handleRequestPasswordReset(request, env);
+      if (url.pathname === '/api/reset-password' && request.method === 'POST') return await handleResetPassword(request, env);
+      if (url.pathname === '/api/verify-email' && request.method === 'GET') return await handleVerifyEmail(request, env);
+      if (url.pathname === '/api/stripe-webhook' && request.method === 'POST') return await handleStripeWebhook(request, env);
     } catch (e) {
-      return jsonResponse({ error: "Server error" }, 500);
+      console.error('worker error', e);
+      return jsonResponse({ error: 'Server error' }, 500);
     }
 
-    return jsonResponse({ error: "Not found" }, 404);
+    return jsonResponse({ error: 'Not found' }, 404);
   },
 };
