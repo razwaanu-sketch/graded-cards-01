@@ -504,13 +504,19 @@ async function handleCheckoutCompleted(session, env) {
   const user = await env.DB.prepare("SELECT id FROM users WHERE email = ?").bind(email.toLowerCase()).first();
 
   const lineItems = (fullSession.line_items && fullSession.line_items.data) || [];
+  // TEMPORARY: when the expand fetch didn't come back with line_items, the
+  // fallback name embeds Stripe's actual response so it's visible via a
+  // simple D1 query — Cloudflare's Logs dashboard isn't surfacing our
+  // console.log/console.error output reliably. Revert to plain "Order"
+  // once the root cause is found.
+  const fallbackName = `Order [debug: status=${sessionRes.status} body=${sessionResText.slice(0, 300)}]`;
   const items = lineItems.length
     ? lineItems.map((li) => ({
         name: li.description || "Card",
         amount: li.amount_total,
         currency: (li.currency || session.currency || "gbp").toUpperCase(),
       }))
-    : [{ name: "Order", amount: session.amount_total, currency: (session.currency || "gbp").toUpperCase() }];
+    : [{ name: fallbackName, amount: session.amount_total, currency: (session.currency || "gbp").toUpperCase() }];
 
   for (const item of items) {
     await env.DB.prepare(
