@@ -489,6 +489,13 @@ async function handleCheckoutCompleted(session, env) {
   } catch (e) {
     console.error(`Stripe session expand response wasn't valid JSON: ${sessionResText}`);
   }
+  // Temporary diagnostic: confirm whether Stripe actually honored the
+  // expand params, since a malformed expand request returns 200 with the
+  // base object rather than an error — silently producing the fallback
+  // "Order" name and no receipt_url with nothing in the error logs.
+  console.log(
+    `Stripe session expand check: has line_items=${!!fullSession.line_items}, has payment_intent=${!!fullSession.payment_intent}, payment_intent type=${typeof fullSession.payment_intent}`
+  );
 
   const paymentIntent = fullSession.payment_intent;
   const paymentIntentId = paymentIntent ? paymentIntent.id : null;
