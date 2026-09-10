@@ -7,21 +7,6 @@
 // `tags` controls which category tiles / filter chips a card shows under on the shop page.
 const PRODUCTS = [
   {
-    id: "test-item",
-    name: "Test",
-    set: "Test listing — not a real card",
-    cardNumber: "N/A",
-    grade: "N/A",
-    gradeLabel: "TEST",
-    certNumber: "N/A",
-    price: 1,
-    currency: "GBP",
-    image: "images/cards/test-item.jpg",
-    stripeLink: "https://buy.stripe.com/cNi3cv3ZV9NH0rZbX50oM0c",
-    sold: false,
-    tags: []
-  },
-  {
     id: "eevee-ex",
     name: "Eevee ex",
     set: "2024 Pokémon SV8a (Japanese) — Special Art Rare",
