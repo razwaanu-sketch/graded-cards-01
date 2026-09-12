@@ -125,10 +125,24 @@ body{
 .hamburger::after{top:6px}
 
 /* Hero */
-.hero{min-height:auto;display:flex;align-items:center;position:relative;padding:64px 18px 52px;border-bottom:1px solid var(--line-soft);background:
-    radial-gradient(ellipse 900px 480px at 85% -10%, rgba(216,171,63,.10), transparent 60%),
+.hero{
+  min-height:auto;display:flex;align-items:center;position:relative;padding:64px 18px 52px;
+  border-bottom:1px solid var(--line-soft);overflow:hidden;
+  background:
+    radial-gradient(ellipse 900px 480px at 85% -10%, rgba(216,171,63,.14), transparent 60%),
+    linear-gradient(135deg, rgba(255,255,255,.05) 25%, transparent 25.5%),
+    linear-gradient(225deg, rgba(255,255,255,.05) 25%, transparent 25.5%),
+    linear-gradient(45deg, rgba(0,0,0,.4) 25%, transparent 25.5%),
+    linear-gradient(315deg, rgba(0,0,0,.4) 25%, transparent 25.5%),
     var(--bg);
-  overflow:hidden}
+  background-position: 0 0, 24px 0, 24px 0, 0 0, 0 0;
+  background-size: auto, 48px 48px, 48px 48px, 48px 48px, 48px 48px;
+}
+.hero::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:2px;z-index:2;
+  background:linear-gradient(90deg, transparent, var(--gold-2) 42%, #fff6de 50%, var(--gold-2) 58%, transparent);
+  box-shadow:0 0 22px 3px rgba(231,189,87,.55);
+}
 .container{width:100%;max-width:var(--max-width);margin:0 auto}
 .hero-inner{display:flex;flex-direction:column;gap:32px;align-items:stretch;justify-content:space-between;position:relative;z-index:1}
 .hero-copy{text-align:left}
