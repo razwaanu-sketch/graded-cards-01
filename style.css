@@ -243,6 +243,7 @@ body{
 .prose a{color:var(--gold)}
 .prose .btn-gold{color:var(--gold-ink)}
 .prose .btn-outline, .prose .btn-ghost{color:var(--ink)}
+.coming-soon-badge{display:inline-block;background:var(--bg-card);border:1px solid var(--gold);color:var(--gold);font-family:var(--mono);font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:.5rem 1.1rem;margin:.5rem 0 1.4rem}
 .placeholder{color:#e7b8b8;background:rgba(200,60,60,0.08);border:1px dashed rgba(200,60,60,0.4);padding:.05rem .4rem;border-radius:0;font-size:.92em}
 .return-address{font-family:var(--mono);font-size:.86rem;color:var(--ink);border-left:2px solid var(--gold);padding:.2rem 0 .2rem 14px;margin:.6rem 0 1.2rem;line-height:1.6}
 
