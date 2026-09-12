@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Your Cart — Graded Cards 01</title>
-  <meta name="description" content="Review the cards in your cart before checkout." />
-  <meta property="og:title" content="Your Cart — Graded Cards 01" />
-  <meta property="og:description" content="Review the cards in your cart before checkout." />
+  <title>Sealed Product — Graded Cards 01</title>
+  <meta name="description" content="Sealed Pokémon product from Graded Cards 01 — coming soon." />
+  <meta property="og:title" content="Sealed Product — Graded Cards 01" />
+  <meta property="og:description" content="Sealed Pokémon product from Graded Cards 01 — coming soon." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://www.gradedcards01.com/images/og-image.jpg" />
-  <meta property="og:url" content="https://www.gradedcards01.com/cart.html" />
+  <meta property="og:url" content="https://www.gradedcards01.com/sealed.html" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://www.gradedcards01.com/images/og-image.jpg" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -50,33 +50,23 @@
 
   <main id="main">
     <section class="page-hero">
-      <h1>Your Cart</h1>
-      <p>Review your selected cards before checkout</p>
+      <h1>Sealed Product</h1>
+      <p>Booster boxes, elite trainer boxes, and more</p>
     </section>
 
-    <section class="prose cart-page">
-      <div id="cart-empty" hidden>
-        <p style="text-align:center">Your cart is empty. <a href="index.html#shop">Browse the collection →</a></p>
-      </div>
-
-      <p id="checkout-result" class="checkout-result" hidden></p>
-
-      <div id="cart-list" class="cart-list"></div>
-
-      <div id="cart-summary" class="cart-summary" hidden>
-        <div class="cart-summary-row">
-          <span>Subtotal</span>
-          <span id="cart-subtotal"></span>
-        </div>
-        <button type="button" id="combined-checkout-btn" class="btn-gold btn-block" hidden>Pay for everything (1 checkout)</button>
-        <p id="combined-checkout-status" class="checkout-status" hidden></p>
-        <p id="combined-invoice-note" class="form-note">
-          Because each card is a unique, individually graded item, you'll complete payment for each card
-          separately using its own secure Stripe link above. Want everything on one combined payment instead?
-          <a id="combined-invoice-link" href="contact.html">Request a combined invoice</a> and we'll send you a
-          single payment link for your whole order.
-        </p>
-      </div>
+    <section class="prose">
+      <p style="text-align:center">
+        <span class="coming-soon-badge">Coming soon</span>
+      </p>
+      <p>
+        We're putting together a range of sealed Japanese and English Pokémon product to go alongside our graded
+        singles — think booster boxes, elite trainer boxes, and special-edition sets. Nothing is listed yet, but
+        it's on the way.
+      </p>
+      <p style="text-align:center">
+        Want to know the moment it's live? <a href="contact.html">Get in touch</a> and we'll let you know, or
+        <a href="index.html#shop">browse our graded cards</a> in the meantime.
+      </p>
     </section>
 
     <footer class="site-footer container" role="contentinfo">
@@ -95,10 +85,8 @@
     </footer>
   </main>
 
-  <script src="products.js" defer></script>
   <script src="cart.js" defer></script>
   <script src="analytics.js" defer></script>
-  <script src="cart-page.js" defer></script>
   <script src="script.js" defer></script>
 </body>
 </html>
