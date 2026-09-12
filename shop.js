@@ -82,7 +82,8 @@
 
     const gradeBadge = document.createElement("span");
     gradeBadge.className = "grade-badge";
-    gradeBadge.textContent = `${product.grade} ${product.gradeLabel}`;
+    gradeBadge.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.5l4.5 4.5L19.5 6"/></svg>`;
+    gradeBadge.appendChild(document.createTextNode(`${product.grade} ${product.gradeLabel}`));
     media.appendChild(gradeBadge);
 
     if (product.sold) {
