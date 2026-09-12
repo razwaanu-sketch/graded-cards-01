@@ -35,7 +35,6 @@ html,body{height:100%}
 body{
   margin:0;
   font-family:var(--font);
-  background:var(--bg);
   color:var(--ink);
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
@@ -44,6 +43,22 @@ body{
   overflow-x:hidden;
   scroll-behavior:smooth;
   padding-top:calc(var(--topbar-h) + 72px); /* topbar + header height */
+  /* Site-wide quilted-leather ambience: soft diagonal facets (light/dark)
+     form a diamond weave, plus a faint per-diamond "puff" highlight for a
+     raised, padded feel. Kept very low-opacity and warmed slightly gold so
+     it reads as texture, not a grid — panels with their own solid
+     background (cards, nav, footer, search box) simply sit on top of it. */
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(ellipse 1100px 620px at 78% 0%, rgba(216,171,63,.045), transparent 60%),
+    radial-gradient(circle, rgba(231,189,87,.03) 0, rgba(231,189,87,.03) 1.5px, transparent 3px, transparent 100%),
+    linear-gradient(135deg, rgba(231,189,87,.015) 30%, transparent 45%, transparent 55%, rgba(231,189,87,.015) 70%),
+    linear-gradient(225deg, rgba(231,189,87,.015) 30%, transparent 45%, transparent 55%, rgba(231,189,87,.015) 70%),
+    linear-gradient(45deg, rgba(0,0,0,.075) 30%, transparent 45%, transparent 55%, rgba(0,0,0,.075) 70%),
+    linear-gradient(315deg, rgba(0,0,0,.075) 30%, transparent 45%, transparent 55%, rgba(0,0,0,.075) 70%);
+  background-size:1400px 800px, 120px 120px, 120px 120px, 120px 120px, 120px 120px, 120px 120px;
+  background-position:50% 0, 60px 60px, 0 0, 60px 0, 0 0, 60px 0;
+  background-repeat:no-repeat, repeat, repeat, repeat, repeat, repeat;
 }
 
 /* Topbar */
@@ -128,15 +143,9 @@ body{
 .hero{
   min-height:auto;display:flex;align-items:center;position:relative;padding:64px 18px 52px;
   border-bottom:1px solid var(--line-soft);overflow:hidden;
-  background:
-    radial-gradient(ellipse 900px 480px at 85% -10%, rgba(216,171,63,.14), transparent 60%),
-    linear-gradient(135deg, rgba(255,255,255,.05) 25%, transparent 25.5%),
-    linear-gradient(225deg, rgba(255,255,255,.05) 25%, transparent 25.5%),
-    linear-gradient(45deg, rgba(0,0,0,.4) 25%, transparent 25.5%),
-    linear-gradient(315deg, rgba(0,0,0,.4) 25%, transparent 25.5%),
-    var(--bg);
-  background-position: 0 0, 24px 0, 24px 0, 0 0, 0 0;
-  background-size: auto, 48px 48px, 48px 48px, 48px 48px, 48px 48px;
+  /* No solid fill here — the body's site-wide quilted background shows
+     through; this just adds an extra warm spotlight local to the hero. */
+  background:radial-gradient(ellipse 900px 480px at 85% -10%, rgba(216,171,63,.12), transparent 60%);
 }
 .hero::before{
   content:"";position:absolute;top:0;left:0;right:0;height:2px;z-index:2;
