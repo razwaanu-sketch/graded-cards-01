@@ -105,7 +105,8 @@
 
     const cert = document.createElement("p");
     cert.className = "product-cert";
-    cert.textContent = `PSA cert #${product.certNumber}`;
+    const gradingCompany = product.grade.split(" ")[0];
+    cert.textContent = `${gradingCompany} cert #${product.certNumber}`;
 
     const footer = document.createElement("div");
     footer.className = "product-footer";
