@@ -71,11 +71,12 @@
     // browser's <picture> source-selection sees the <source> before the <img>
     // starts loading — appending an already-src'd <img> into <picture> after
     // the fact causes some browsers to fetch both the source and the img src.
-    // Add explicit srcset and decoding attributes so high-density (retina)
-    // displays can pick an appropriately-dense image and the browser can
-    // decode asynchronously before painting. We deliberately reference the
-    // same file for 1x and 2x so the highest-quality file you already host is
-    // available to the browser without altering or re-encoding the originals.
+    // Use the high-quality JPG/WebP at both 1x and 2x densities to avoid
+    // upscaling. The original card photos are already full-resolution, so
+    // serving the same file at both densities ensures crisp rendering on
+    // high-density (Retina) displays without artificial scaling.
+    // Add explicit srcset and decoding attributes for async decode and
+    // optimal rendering timing.
     media.innerHTML = `<picture>
       <source srcset="${product.image.replace(/\.jpg$/, ".webp")} 1x, ${product.image.replace(/\.jpg$/, ".webp")} 2x" type="image/webp">
       <img src="${product.image}" srcset="${product.image} 1x, ${product.image} 2x" alt="${product.name} — ${product.grade} graded Pokémon card, front view" loading="lazy" decoding="async">
@@ -183,9 +184,11 @@
       btn.type = "button";
       btn.className = "category-tile";
       btn.setAttribute("data-tag", cat.tag);
+      // Like product cards, serve the high-quality WebP/JPG at both densities
+      // to avoid upscaling on high-density displays, keeping thumbnails crisp.
       btn.innerHTML = `
         <span class="category-tile-num">${String(i + 1).padStart(2, "0")}</span>
-        <span class="category-tile-thumb"><picture><source srcset="${cat.image.replace(/\.jpg$/, ".webp")} 1x, ${cat.image.replace(/\.jpg$/, ".webp")} 2x" type="image/webp"><img src="${cat.image}" srcset="${cat.image} 1x, ${cat.image} 2x" alt="" loading="lazy" decoding="async"></picture></span>
+        <span class="category-tile-thumb"><picture><source srcset="${cat.image.replace(/\.jpg$/, ".webp")} 1x, ${cat.image.replace(/\.jpg$/, ".webp")} 2x" type="image/webp"><img src="${cat.image}" srcset="${cat.image} 1x, ${cat.image} 2x" alt="${cat.label} category" loading="lazy" decoding="async"></picture></span>
         <span class="category-tile-text">
           <span class="category-tile-label">${cat.label}</span>
           <span class="category-tile-sub">${cat.sub}</span>
