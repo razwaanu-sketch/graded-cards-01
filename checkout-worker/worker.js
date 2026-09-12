@@ -101,9 +101,10 @@ export default {
       params.set(`line_items[${i}][price_data][currency]`, (p.currency || "GBP").toLowerCase());
       params.set(`line_items[${i}][price_data][unit_amount]`, String(Math.round(p.price * 100)));
       params.set(`line_items[${i}][price_data][product_data][name]`, p.name);
+      const gradingCompany = (p.grade || "PSA").split(" ")[0];
       params.set(
         `line_items[${i}][price_data][product_data][description]`,
-        `${p.set} - #${p.cardNumber} - PSA cert #${p.certNumber}`
+        `${p.set} - #${p.cardNumber} - ${gradingCompany} cert #${p.certNumber}`
       );
       params.set(`line_items[${i}][price_data][product_data][images][0]`, `${SITE_ORIGIN}/${p.image}`);
     });
