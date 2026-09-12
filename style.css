@@ -50,14 +50,14 @@ body{
      background (cards, nav, footer, search box) simply sit on top of it. */
   background-color:var(--bg);
   background-image:
-    radial-gradient(ellipse 1100px 620px at 78% 0%, rgba(216,171,63,.045), transparent 60%),
-    radial-gradient(circle, rgba(231,189,87,.03) 0, rgba(231,189,87,.03) 1.5px, transparent 3px, transparent 100%),
-    linear-gradient(135deg, rgba(231,189,87,.015) 30%, transparent 45%, transparent 55%, rgba(231,189,87,.015) 70%),
-    linear-gradient(225deg, rgba(231,189,87,.015) 30%, transparent 45%, transparent 55%, rgba(231,189,87,.015) 70%),
-    linear-gradient(45deg, rgba(0,0,0,.075) 30%, transparent 45%, transparent 55%, rgba(0,0,0,.075) 70%),
-    linear-gradient(315deg, rgba(0,0,0,.075) 30%, transparent 45%, transparent 55%, rgba(0,0,0,.075) 70%);
-  background-size:1400px 800px, 120px 120px, 120px 120px, 120px 120px, 120px 120px, 120px 120px;
-  background-position:50% 0, 60px 60px, 0 0, 60px 0, 0 0, 60px 0;
+    radial-gradient(ellipse 1100px 620px at 78% 0%, rgba(216,171,63,.05), transparent 60%),
+    radial-gradient(circle, rgba(231,189,87,.04) 0, rgba(231,189,87,.04) 1.5px, transparent 3px, transparent 100%),
+    linear-gradient(135deg, rgba(231,189,87,.028) 24%, transparent 29%, transparent 71%, rgba(231,189,87,.028) 76%),
+    linear-gradient(225deg, rgba(231,189,87,.028) 24%, transparent 29%, transparent 71%, rgba(231,189,87,.028) 76%),
+    linear-gradient(45deg, rgba(0,0,0,.14) 24%, transparent 29%, transparent 71%, rgba(0,0,0,.14) 76%),
+    linear-gradient(315deg, rgba(0,0,0,.14) 24%, transparent 29%, transparent 71%, rgba(0,0,0,.14) 76%);
+  background-size:1400px 800px, 90px 90px, 90px 90px, 90px 90px, 90px 90px, 90px 90px;
+  background-position:50% 0, 45px 45px, 0 0, 45px 0, 0 0, 45px 0;
   background-repeat:no-repeat, repeat, repeat, repeat, repeat, repeat;
 }
 
