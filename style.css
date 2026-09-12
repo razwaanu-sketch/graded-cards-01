@@ -43,22 +43,22 @@ body{
   overflow-x:hidden;
   scroll-behavior:smooth;
   padding-top:calc(var(--topbar-h) + 72px); /* topbar + header height */
-  /* Site-wide quilted-leather ambience: soft diagonal facets (light/dark)
-     form a diamond weave, plus a faint per-diamond "puff" highlight for a
-     raised, padded feel. Kept very low-opacity and warmed slightly gold so
-     it reads as texture, not a grid — panels with their own solid
-     background (cards, nav, footer, search box) simply sit on top of it. */
+  /* Site-wide black quilted-leather ambience: diagonal "stitch" lines form
+     a diamond grid, small button studs sit at each corner, and a soft
+     radial "puff" glow in each diamond gives a raised, padded look. Kept
+     very low-opacity so it reads as texture, not a grid — panels with
+     their own solid background (cards, nav, footer, search box) simply
+     sit on top of it. */
   background-color:var(--bg);
   background-image:
-    radial-gradient(ellipse 1100px 620px at 78% 0%, rgba(216,171,63,.05), transparent 60%),
-    radial-gradient(circle, rgba(231,189,87,.04) 0, rgba(231,189,87,.04) 1.5px, transparent 3px, transparent 100%),
-    linear-gradient(135deg, rgba(231,189,87,.028) 24%, transparent 29%, transparent 71%, rgba(231,189,87,.028) 76%),
-    linear-gradient(225deg, rgba(231,189,87,.028) 24%, transparent 29%, transparent 71%, rgba(231,189,87,.028) 76%),
-    linear-gradient(45deg, rgba(0,0,0,.14) 24%, transparent 29%, transparent 71%, rgba(0,0,0,.14) 76%),
-    linear-gradient(315deg, rgba(0,0,0,.14) 24%, transparent 29%, transparent 71%, rgba(0,0,0,.14) 76%);
-  background-size:1400px 800px, 90px 90px, 90px 90px, 90px 90px, 90px 90px, 90px 90px;
-  background-position:50% 0, 45px 45px, 0 0, 45px 0, 0 0, 45px 0;
-  background-repeat:no-repeat, repeat, repeat, repeat, repeat, repeat;
+    radial-gradient(ellipse 1100px 620px at 78% 0%, rgba(216,171,63,.045), transparent 60%),
+    radial-gradient(circle, rgba(238,231,218,.11) 0, rgba(238,231,218,.11) 1.6px, transparent 3px, transparent 100%),
+    radial-gradient(circle, rgba(255,255,255,.045) 0%, transparent 62%),
+    repeating-linear-gradient(45deg, rgba(230,222,208,.075) 0 1.3px, transparent 1.3px 63.64px),
+    repeating-linear-gradient(135deg, rgba(230,222,208,.075) 0 1.3px, transparent 1.3px 63.64px);
+  background-size:1400px 800px, 90px 90px, 90px 90px, auto, auto;
+  background-position:50% 0, 45px 45px, 0 0, 0 0, 0 0;
+  background-repeat:no-repeat, repeat, repeat, repeat, repeat;
 }
 
 /* Topbar */
