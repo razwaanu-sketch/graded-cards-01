@@ -43,22 +43,7 @@ body{
   overflow-x:hidden;
   scroll-behavior:smooth;
   padding-top:calc(var(--topbar-h) + 72px); /* topbar + header height */
-  /* Site-wide black quilted-leather ambience: diagonal "stitch" lines form
-     a diamond grid, small button studs sit at each corner, and a soft
-     radial "puff" glow in each diamond gives a raised, padded look. Kept
-     very low-opacity so it reads as texture, not a grid — panels with
-     their own solid background (cards, nav, footer, search box) simply
-     sit on top of it. */
-  background-color:var(--bg);
-  background-image:
-    radial-gradient(ellipse 1100px 620px at 78% 0%, rgba(216,171,63,.045), transparent 60%),
-    radial-gradient(circle, rgba(238,231,218,.11) 0, rgba(238,231,218,.11) 1.6px, transparent 3px, transparent 100%),
-    radial-gradient(circle, rgba(255,255,255,.045) 0%, transparent 62%),
-    repeating-linear-gradient(45deg, rgba(230,222,208,.075) 0 1.3px, transparent 1.3px 63.64px),
-    repeating-linear-gradient(135deg, rgba(230,222,208,.075) 0 1.3px, transparent 1.3px 63.64px);
-  background-size:1400px 800px, 90px 90px, 90px 90px, auto, auto;
-  background-position:50% 0, 45px 45px, 0 0, 0 0, 0 0;
-  background-repeat:no-repeat, repeat, repeat, repeat, repeat;
+  background:var(--bg);
 }
 
 /* Topbar */
@@ -143,9 +128,20 @@ body{
 .hero{
   min-height:auto;display:flex;align-items:center;position:relative;padding:64px 18px 52px;
   border-bottom:1px solid var(--line-soft);overflow:hidden;
-  /* No solid fill here — the body's site-wide quilted background shows
-     through; this just adds an extra warm spotlight local to the hero. */
-  background:radial-gradient(ellipse 900px 480px at 85% -10%, rgba(216,171,63,.12), transparent 60%);
+  /* Black quilted-leather texture, scoped to the hero only: diagonal
+     "stitch" lines form a diamond grid, small button studs sit at each
+     corner, and a soft radial "puff" glow in each diamond gives a raised,
+     padded look. Kept low-opacity so it stays behind the hero copy. */
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(ellipse 900px 480px at 85% -10%, rgba(216,171,63,.12), transparent 60%),
+    radial-gradient(circle, rgba(238,231,218,.11) 0, rgba(238,231,218,.11) 1.6px, transparent 3px, transparent 100%),
+    radial-gradient(circle, rgba(255,255,255,.045) 0%, transparent 62%),
+    repeating-linear-gradient(45deg, rgba(230,222,208,.075) 0 1.3px, transparent 1.3px 63.64px),
+    repeating-linear-gradient(135deg, rgba(230,222,208,.075) 0 1.3px, transparent 1.3px 63.64px);
+  background-size:auto, 90px 90px, 90px 90px, auto, auto;
+  background-position:0 0, 45px 45px, 0 0, 0 0, 0 0;
+  background-repeat:no-repeat, repeat, repeat, repeat, repeat;
 }
 .hero::before{
   content:"";position:absolute;top:0;left:0;right:0;height:2px;z-index:2;
