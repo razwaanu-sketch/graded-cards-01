@@ -155,6 +155,111 @@ const PRODUCTS = [
     stripeLink: "https://buy.stripe.com/5kQeVdcwr8JD2A75yH0oM0b",
     sold: false,
     tags: ["other"]
+  },
+  {
+    id: "mega-gengar-ex-ascended",
+    name: "Mega Gengar ex",
+    set: "2026 Pokémon Ascended Heroes (English) — Mega Attack Rare",
+    cardNumber: "269/217",
+    grade: "PSA 10",
+    gradeLabel: "GEM MINT",
+    certNumber: "867276",
+    price: 200,
+    currency: "GBP",
+    image: "images/cards/mega-gengar-ex-ascended.jpg",
+    stripeLink: "",
+    sold: false,
+    tags: ["mega-evolution"]
+  },
+  {
+    id: "ninetales",
+    name: "Ninetales",
+    set: "2016 Pokémon XY Evolutions (English) — Holo",
+    cardNumber: "15/108",
+    grade: "PSA 9",
+    gradeLabel: "MINT",
+    certNumber: "61787471",
+    price: 200,
+    currency: "GBP",
+    image: "images/cards/ninetales.jpg",
+    stripeLink: "",
+    sold: false,
+    tags: ["other"]
+  },
+  {
+    id: "mewtwo-ex",
+    name: "Mewtwo EX",
+    set: "2016 Pokémon XY Evolutions (English)",
+    cardNumber: "52/108",
+    grade: "PSA 8",
+    gradeLabel: "NM-MT",
+    certNumber: "61787472",
+    price: 100,
+    currency: "GBP",
+    image: "images/cards/mewtwo-ex.jpg",
+    stripeLink: "",
+    sold: false,
+    tags: ["other"]
+  },
+  {
+    id: "pidgeot-ex",
+    name: "Pidgeot EX",
+    set: "2016 Pokémon XY Evolutions (English) — Full Art",
+    cardNumber: "104/108",
+    grade: "PSA 8",
+    gradeLabel: "NM-MT",
+    certNumber: "61787473",
+    price: 100,
+    currency: "GBP",
+    image: "images/cards/pidgeot-ex.jpg",
+    stripeLink: "",
+    sold: false,
+    tags: ["other"]
+  },
+  {
+    id: "charizard-v",
+    name: "Charizard V",
+    set: "2022 Pokémon SWSH VSTAR Universe (Japanese) — Full Art",
+    cardNumber: "211/172",
+    grade: "PSA 10",
+    gradeLabel: "GEM MT",
+    certNumber: "99246421",
+    price: 250,
+    currency: "GBP",
+    image: "images/cards/charizard-v.jpg",
+    stripeLink: "",
+    sold: false,
+    tags: ["other"]
+  },
+  {
+    id: "charizard-holo-1st-ed",
+    name: "Charizard",
+    set: "2016 Pokémon 20th Anniversary (Japanese) — Holo, 1st Edition",
+    cardNumber: "011/087",
+    grade: "PSA 9",
+    gradeLabel: "MINT",
+    certNumber: "82167987",
+    price: 600,
+    currency: "GBP",
+    image: "images/cards/charizard-holo-1st-ed.jpg",
+    stripeLink: "",
+    sold: false,
+    tags: ["other"]
+  },
+  {
+    id: "mega-dragonite-ex",
+    name: "Mega Dragonite ex",
+    set: "2026 Pokémon Ascended Heroes (English) — Special Illustration Rare",
+    cardNumber: "290/217",
+    grade: "PSA 9",
+    gradeLabel: "MINT",
+    certNumber: "164242287",
+    price: 800,
+    currency: "GBP",
+    image: "images/cards/mega-dragonite-ex.jpg",
+    stripeLink: "",
+    sold: false,
+    tags: ["mega-evolution"]
   }
 ];
 
@@ -163,6 +268,6 @@ const PRODUCTS = [
 const CATEGORIES = [
   { tag: "", label: "All Cards", sub: "The full collection", image: "images/cards/eevee-ex.jpg" },
   { tag: "eeveelution", label: "Eeveelutions", sub: "5 cards", image: "images/cards/eevee-ex.jpg" },
-  { tag: "mega-evolution", label: "Mega Evolutions", sub: "2 cards", image: "images/cards/mega-gengar-ex.jpg" },
-  { tag: "other", label: "Other Singles", sub: "3 cards", image: "images/cards/pikachu-ex.jpg" }
+  { tag: "mega-evolution", label: "Mega Evolutions", sub: "4 cards", image: "images/cards/mega-gengar-ex.jpg" },
+  { tag: "other", label: "Other Singles", sub: "8 cards", image: "images/cards/pikachu-ex.jpg" }
 ];
