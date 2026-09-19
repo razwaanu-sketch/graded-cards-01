@@ -423,6 +423,43 @@ async function handleCreateReturn(request, env) {
   return jsonResponse({ ok: true });
 }
 
+// --- Site visit tracking ---------------------------------------------------
+// Anonymous, cookie-free pageview log for the site owner's private traffic
+// dashboard (visits.html, not linked anywhere on the storefront). Writes are
+// public (just a path + timestamp, no PII) but reads require the ADMIN_KEY
+// secret so only the owner can see traffic numbers.
+
+async function handleTrackVisit(request, env) {
+  const body = await request.json().catch(() => ({}));
+  const path = typeof body.path === "string" && body.path ? body.path.slice(0, 200) : "/";
+  await env.DB.prepare("INSERT INTO page_views (path) VALUES (?)").bind(path).run();
+  return jsonResponse({ ok: true });
+}
+
+async function handleVisitStats(request, env) {
+  const url = new URL(request.url);
+  const key = url.searchParams.get("key") || "";
+  if (!env.ADMIN_KEY || !timingSafeEqual(key, env.ADMIN_KEY)) {
+    return jsonResponse({ error: "Unauthorized" }, 403);
+  }
+
+  const [total, today, lastHour, last5Min, recent] = await Promise.all([
+    env.DB.prepare("SELECT COUNT(*) AS n FROM page_views").first(),
+    env.DB.prepare("SELECT COUNT(*) AS n FROM page_views WHERE date(created_at) = date('now')").first(),
+    env.DB.prepare("SELECT COUNT(*) AS n FROM page_views WHERE created_at > datetime('now', '-1 hour')").first(),
+    env.DB.prepare("SELECT COUNT(*) AS n FROM page_views WHERE created_at > datetime('now', '-5 minutes')").first(),
+    env.DB.prepare("SELECT path, created_at FROM page_views ORDER BY id DESC LIMIT 20").all(),
+  ]);
+
+  return jsonResponse({
+    total: total.n,
+    today: today.n,
+    last_hour: lastHour.n,
+    last_5_min: last5Min.n,
+    recent: recent.results || [],
+  });
+}
+
 // --- Stripe webhook -------------------------------------------------------
 // Verifies the request really came from Stripe (HMAC-SHA256 over the raw
 // body using the endpoint's signing secret) before touching the database.
@@ -584,6 +621,10 @@ export default {
         return await handleResetPassword(request, env);
       if (url.pathname === "/api/stripe-webhook" && request.method === "POST")
         return await handleStripeWebhook(request, env);
+      if (url.pathname === "/api/track-visit" && request.method === "POST")
+        return await handleTrackVisit(request, env);
+      if (url.pathname === "/api/visit-stats" && request.method === "GET")
+        return await handleVisitStats(request, env);
     } catch (e) {
       return jsonResponse({ error: "Server error" }, 500);
     }
