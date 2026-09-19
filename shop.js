@@ -15,6 +15,14 @@
 
   let activeTag = "";
   let activeQuery = "";
+  let activeSort = "price-desc";
+
+  function sortProducts(products) {
+    const sorted = products.slice();
+    if (activeSort === "price-asc") sorted.sort((a, b) => a.price - b.price);
+    else sorted.sort((a, b) => b.price - a.price);
+    return sorted;
+  }
 
   // Click-to-zoom lightbox: shows the full-resolution photo (images/cards-full/)
   // so customers can inspect card and cert detail beyond the small grid thumbnail.
@@ -175,7 +183,7 @@
   function renderGrid() {
     if (!grid) return;
     grid.innerHTML = "";
-    const filtered = PRODUCTS.filter(cardMatches);
+    const filtered = sortProducts(PRODUCTS.filter(cardMatches));
 
     const countEl = document.getElementById("shop-count");
     if (countEl) {
@@ -251,5 +259,14 @@
     document.querySelectorAll(".tag-chip[data-tag], [data-tag].shop-filter-btn").forEach((el) => {
       el.addEventListener("click", () => setFilter(el.getAttribute("data-tag") || "", ""));
     });
+
+    const sortSelect = document.getElementById("sort-select");
+    if (sortSelect) {
+      sortSelect.value = activeSort;
+      sortSelect.addEventListener("change", () => {
+        activeSort = sortSelect.value;
+        renderGrid();
+      });
+    }
   });
 })();
