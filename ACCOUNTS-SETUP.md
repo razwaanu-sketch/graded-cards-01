@@ -79,6 +79,8 @@ ever need to redeploy the Worker or database from scratch.
    - `STRIPE_WEBHOOK_SECRET` — you'll get this in step 7
    - `RESEND_API_KEY` — from step 5
    - `EMAIL_FROM` — your verified from-address, e.g. `no-reply@gradedcards01.com`
+  - `ADMIN_KEY` — a long random string only you know (see "Private site-visit
+    counter" below) — mark as **Secret**
 
 7. **Register the Stripe webhook.** In the
    [Stripe Dashboard → Developers → Webhooks](https://dashboard.stripe.com/webhooks),
@@ -156,6 +158,37 @@ CREATE INDEX IF NOT EXISTS idx_orders_payment_intent ON orders(payment_intent_id
 Orders recorded before this migration will simply have no receipt link and
 can't have their refund status auto-synced (their `payment_intent_id` is
 NULL) — only new orders going forward get both.
+
+## Private site-visit counter
+
+`visits.html` is a real-time traffic dashboard for you only — it isn't
+linked from anywhere on the site (no nav/footer link), and its
+`<meta name="robots">` tag keeps it out of search engines. Every page
+posts an anonymous `{path}` to `/api/track-visit` on load (no cookies, no
+PII — see `visits-track.js`); `visits.html` reads them back via
+`/api/visit-stats`, which requires a `key` query param matching the
+`ADMIN_KEY` secret set in step 6.
+
+**If your D1 database already existed before this feature was added**, run
+this once in the D1 Console tab (same place as the migration below) to add
+the new table:
+
+```sql
+CREATE TABLE IF NOT EXISTS page_views (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  path TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_page_views_created ON page_views(created_at);
+```
+
+**To view it:** open `https://www.gradedcards01.com/visits.html` directly
+(bookmark it — it's not in any menu), enter your `ADMIN_KEY` value once,
+and it's remembered in that browser from then on (stored in
+`localStorage`, not sent anywhere except as the `key` param on this one
+endpoint). It shows total visits, today, last hour, last 5 minutes, and a
+recent-activity list, refreshing every 5 seconds. Tap "Lock" to forget the
+key on that device (e.g. before handing it to someone else).
 
 ## Reviewing return requests
 

@@ -84,3 +84,14 @@ CREATE TABLE IF NOT EXISTS returns (
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_returns_order ON returns(order_id);
+
+-- Lightweight, anonymous page-visit log for the site owner's private
+-- traffic dashboard (visits.html, gated by the ADMIN_KEY secret) — just a
+-- path and timestamp per pageview, no cookies or PII.
+CREATE TABLE IF NOT EXISTS page_views (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  path TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_page_views_created ON page_views(created_at);
