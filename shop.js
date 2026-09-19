@@ -16,6 +16,35 @@
   let activeTag = "";
   let activeQuery = "";
 
+  // Click-to-zoom lightbox: shows the full-resolution photo (images/cards-full/)
+  // so customers can inspect card and cert detail beyond the small grid thumbnail.
+  const lightbox = document.getElementById("lightbox");
+  const lightboxImg = document.getElementById("lightbox-img");
+  const lightboxClose = document.getElementById("lightbox-close");
+
+  function openLightbox(src, alt) {
+    if (!lightbox || !lightboxImg) return;
+    lightboxImg.src = src;
+    lightboxImg.alt = alt;
+    lightbox.hidden = false;
+  }
+
+  function closeLightbox() {
+    if (!lightbox) return;
+    lightbox.hidden = true;
+    lightboxImg.src = "";
+  }
+
+  if (lightbox) {
+    lightboxClose.addEventListener("click", closeLightbox);
+    lightbox.addEventListener("click", (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !lightbox.hidden) closeLightbox();
+    });
+  }
+
   function cardMatches(product) {
     const matchesTag = !activeTag || (product.tags || []).includes(activeTag);
     const q = activeQuery.trim().toLowerCase();
@@ -71,15 +100,9 @@
     // browser's <picture> source-selection sees the <source> before the <img>
     // starts loading — appending an already-src'd <img> into <picture> after
     // the fact causes some browsers to fetch both the source and the img src.
-    // Use the high-quality JPG/WebP at both 1x and 2x densities to avoid
-    // upscaling. The original card photos are already full-resolution, so
-    // serving the same file at both densities ensures crisp rendering on
-    // high-density (Retina) displays without artificial scaling.
-    // Add explicit srcset and decoding attributes for async decode and
-    // optimal rendering timing.
     media.innerHTML = `<picture>
-      <source srcset="${product.image.replace(/\.jpg$/, ".webp")} 1x, ${product.image.replace(/\.jpg$/, ".webp")} 2x" type="image/webp">
-      <img src="${product.image}" srcset="${product.image} 1x, ${product.image} 2x" alt="${product.name} — ${product.grade} graded Pokémon card, front view" loading="lazy" decoding="async">
+      <source srcset="${product.image.replace(/\.jpg$/, ".webp")}" type="image/webp">
+      <img src="${product.image}" alt="${product.name} — ${product.grade} graded Pokémon card, front view" loading="lazy">
     </picture>`;
     const img = media.querySelector("img");
     img.addEventListener("error", () => {
@@ -90,6 +113,17 @@
     gradeBadge.className = "grade-badge";
     gradeBadge.textContent = `${product.grade} ${product.gradeLabel}`;
     media.appendChild(gradeBadge);
+
+    const zoomBtn = document.createElement("button");
+    zoomBtn.type = "button";
+    zoomBtn.className = "zoom-btn";
+    zoomBtn.setAttribute("aria-label", `Zoom in on ${product.name}`);
+    zoomBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="15.5" y1="15.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10.5" y1="7.5" x2="10.5" y2="13.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="7.5" y1="10.5" x2="13.5" y2="10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+    zoomBtn.addEventListener("click", () => {
+      const fullSrc = product.image.replace("images/cards/", "images/cards-full/");
+      openLightbox(fullSrc, `${product.name} — ${product.grade} graded Pokémon card, front view`);
+    });
+    media.appendChild(zoomBtn);
 
     if (product.sold) {
       const soldBadge = document.createElement("span");
@@ -184,11 +218,9 @@
       btn.type = "button";
       btn.className = "category-tile";
       btn.setAttribute("data-tag", cat.tag);
-      // Like product cards, serve the high-quality WebP/JPG at both densities
-      // to avoid upscaling on high-density displays, keeping thumbnails crisp.
       btn.innerHTML = `
         <span class="category-tile-num">${String(i + 1).padStart(2, "0")}</span>
-        <span class="category-tile-thumb"><picture><source srcset="${cat.image.replace(/\.jpg$/, ".webp")} 1x, ${cat.image.replace(/\.jpg$/, ".webp")} 2x" type="image/webp"><img src="${cat.image}" srcset="${cat.image} 1x, ${cat.image} 2x" alt="${cat.label} category" loading="lazy" decoding="async"></picture></span>
+        <span class="category-tile-thumb"><picture><source srcset="${cat.image.replace(/\.jpg$/, ".webp")}" type="image/webp"><img src="${cat.image}" alt="" loading="lazy"></picture></span>
         <span class="category-tile-text">
           <span class="category-tile-label">${cat.label}</span>
           <span class="category-tile-sub">${cat.sub}</span>
