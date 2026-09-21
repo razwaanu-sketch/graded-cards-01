@@ -182,7 +182,7 @@ const PRODUCTS = [
     price: 200,
     currency: "GBP",
     image: "images/cards/ninetales.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/4gMaEXaoj7Fz3Eb1ir0oM0e",
     sold: false,
     tags: ["other"]
   },
