@@ -171,6 +171,12 @@
 
     card.appendChild(media);
     card.appendChild(body);
+
+    card.addEventListener("click", (e) => {
+      if (e.target.closest("a, .cart-toggle")) return;
+      window.location.href = `product.html?id=${p.id}`;
+    });
+
     return card;
   }
 

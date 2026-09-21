@@ -143,6 +143,17 @@
 
     card.appendChild(media);
     card.appendChild(body);
+
+    // Make the whole tile clickable through to the product page — the image
+    // and title are already real links (for keyboard nav / open-in-new-tab),
+    // this just extends the same destination to the rest of the card (meta,
+    // cert, price, empty padding), while leaving the Add to cart button and
+    // those links to handle their own clicks natively.
+    card.addEventListener("click", (e) => {
+      if (e.target.closest("a, .cart-toggle")) return;
+      window.location.href = `product.html?id=${product.id}`;
+    });
+
     return card;
   }
 
