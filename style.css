@@ -189,7 +189,7 @@ body{
 }
 .product-card{
   display:flex;flex-direction:column;border-radius:0;padding:0;background:var(--bg-card);box-shadow:none;border:1px solid var(--line-soft);transition:border-color .22s var(--ease);
-  overflow:hidden;
+  overflow:hidden;cursor:pointer;
 }
 .product-card:hover, .product-card:focus-within{border-color:var(--gold)}
 .product-media{position:relative;overflow:hidden;aspect-ratio:5/8;background:var(--bg-deep);border:1px solid var(--gold);margin:14px;padding:5px}
