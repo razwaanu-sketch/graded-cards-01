@@ -242,7 +242,7 @@ const PRODUCTS = [
     price: 600,
     currency: "GBP",
     image: "images/cards/charizard-holo-1st-ed.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/aFaeVdeEz5xrfmT6CL0oM0i",
     sold: false,
     tags: ["other"]
   },
