@@ -386,6 +386,24 @@ body{
 .cookie-banner a{color:var(--gold)}
 .cookie-banner-actions{display:flex;gap:10px;flex:0 0 auto}
 
+/* Phones: two smaller cards per row instead of one full-width card */
+@media(max-width:599px){
+  .product-grid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .product-media{margin:8px;padding:4px}
+  .grade-badge{font-size:.5rem;padding:.22rem .4rem}
+  .sold-badge{font-size:.5rem;padding:.22rem .4rem}
+  .zoom-btn{width:26px;height:26px}
+  .zoom-btn svg{width:12px;height:12px}
+  .product-body{padding:4px 10px 12px}
+  .product-title{font-size:.82rem}
+  .product-meta{font-size:.66rem;margin:.25rem 0}
+  .product-cert{font-size:.56rem}
+  .product-footer{padding-top:8px}
+  .price{font-size:.98rem}
+  .oneof{font-size:.52rem}
+  .cart-toggle{font-size:.76rem;padding:.55rem .4rem;margin-top:8px}
+}
+
 /* Larger screens */
 @media(min-width:780px){
   .nav-menu{display:flex}
