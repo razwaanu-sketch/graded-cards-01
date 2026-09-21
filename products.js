@@ -212,7 +212,7 @@ const PRODUCTS = [
     price: 100,
     currency: "GBP",
     image: "images/cards/pidgeot-ex.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/aFa7sLcwrgc57Urgdl0oM0g",
     sold: false,
     tags: ["other"]
   },
