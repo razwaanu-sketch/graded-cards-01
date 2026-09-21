@@ -167,7 +167,7 @@ const PRODUCTS = [
     price: 200,
     currency: "GBP",
     image: "images/cards/mega-gengar-ex-ascended.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/aFa28r6833pj3Eb2mv0oM0d",
     sold: false,
     tags: ["mega-evolution"]
   },
