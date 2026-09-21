@@ -197,7 +197,7 @@ const PRODUCTS = [
     price: 100,
     currency: "GBP",
     image: "images/cards/mewtwo-ex.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/fZu8wPeEz2lf0rZ5yH0oM0f",
     sold: false,
     tags: ["other"]
   },
