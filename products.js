@@ -257,7 +257,7 @@ const PRODUCTS = [
     price: 800,
     currency: "GBP",
     image: "images/cards/mega-dragonite-ex.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/5kQ4gz8gb3pjcaH6CL0oM0j",
     sold: false,
     tags: ["mega-evolution"]
   }
