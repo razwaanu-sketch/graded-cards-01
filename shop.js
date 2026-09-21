@@ -108,10 +108,12 @@
     // browser's <picture> source-selection sees the <source> before the <img>
     // starts loading — appending an already-src'd <img> into <picture> after
     // the fact causes some browsers to fetch both the source and the img src.
-    media.innerHTML = `<picture>
-      <source srcset="${product.image.replace(/\.jpg$/, ".webp")}" type="image/webp">
-      <img src="${product.image}" alt="${product.name} — ${product.grade} graded Pokémon card, front view" loading="lazy">
-    </picture>`;
+    media.innerHTML = `<a class="product-media-link" href="product.html?id=${product.id}" aria-label="View ${product.name} details">
+      <picture>
+        <source srcset="${product.image.replace(/\.jpg$/, ".webp")}" type="image/webp">
+        <img src="${product.image}" alt="${product.name} — ${product.grade} graded Pokémon card, front view" loading="lazy">
+      </picture>
+    </a>`;
     const img = media.querySelector("img");
     img.addEventListener("error", () => {
       img.src = "images/cards/placeholder.svg";
@@ -145,7 +147,11 @@
 
     const title = document.createElement("h3");
     title.className = "product-title";
-    title.textContent = product.name;
+    const titleLink = document.createElement("a");
+    titleLink.className = "product-title-link";
+    titleLink.href = `product.html?id=${product.id}`;
+    titleLink.textContent = product.name;
+    title.appendChild(titleLink);
 
     const meta = document.createElement("p");
     meta.className = "product-meta";
