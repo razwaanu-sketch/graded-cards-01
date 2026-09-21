@@ -83,6 +83,110 @@
     if (el) el.setAttribute("content", value);
   }
 
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // Prefers cards sharing a category tag with the one being viewed, then
+  // fills any remaining slots from the rest of the catalog — never the
+  // current or sold-out cards.
+  function pickRelated(current, all, count) {
+    const pool = all.filter((p) => p.id !== current.id && !p.sold);
+    const sameCategory = pool.filter((p) => (p.tags || []).some((t) => (current.tags || []).includes(t)));
+    const sameCategoryIds = new Set(sameCategory.map((p) => p.id));
+    const rest = pool.filter((p) => !sameCategoryIds.has(p.id));
+    return shuffle(sameCategory).concat(shuffle(rest)).slice(0, count);
+  }
+
+  // Same card markup/behaviour as the shop grid (shop.js renderCard), minus
+  // nothing — reused here so a related card is fully consistent, including
+  // its own working Add to cart.
+  function renderRelatedCard(p) {
+    const card = document.createElement("article");
+    card.className = "product-card";
+    card.setAttribute("role", "listitem");
+
+    const media = document.createElement("div");
+    media.className = "product-media";
+    media.innerHTML = `<a class="product-media-link" href="product.html?id=${p.id}" aria-label="View ${p.name} details">
+      <picture>
+        <source srcset="${p.image.replace(/\.jpg$/, ".webp")}" type="image/webp">
+        <img src="${p.image}" alt="${p.name} — ${p.grade} graded Pokémon card, front view" loading="lazy">
+      </picture>
+    </a>`;
+    const img = media.querySelector("img");
+    img.addEventListener("error", () => {
+      img.src = "images/cards/placeholder.svg";
+    });
+
+    const gradeBadge = document.createElement("span");
+    gradeBadge.className = "grade-badge";
+    gradeBadge.textContent = `${p.grade} ${p.gradeLabel}`;
+    media.appendChild(gradeBadge);
+
+    const body = document.createElement("div");
+    body.className = "product-body";
+
+    const title = document.createElement("h3");
+    title.className = "product-title";
+    const titleLink = document.createElement("a");
+    titleLink.className = "product-title-link";
+    titleLink.href = `product.html?id=${p.id}`;
+    titleLink.textContent = p.name;
+    title.appendChild(titleLink);
+
+    const meta = document.createElement("p");
+    meta.className = "product-meta";
+    meta.textContent = `${p.set} · #${p.cardNumber}`;
+
+    const cert = document.createElement("p");
+    cert.className = "product-cert";
+    const gradingCompany = p.grade.split(" ")[0];
+    cert.textContent = `${gradingCompany} cert #${p.certNumber}`;
+
+    const footer = document.createElement("div");
+    footer.className = "product-footer";
+    const price = document.createElement("span");
+    price.className = "price";
+    price.textContent = formatPrice(p.price, p.currency);
+    footer.appendChild(price);
+    const oneOf = document.createElement("span");
+    oneOf.className = "oneof";
+    oneOf.textContent = "1 of 1";
+    footer.appendChild(oneOf);
+
+    const cartActionContainer = document.createElement("div");
+
+    body.appendChild(title);
+    body.appendChild(meta);
+    body.appendChild(cert);
+    body.appendChild(footer);
+    body.appendChild(cartActionContainer);
+    renderCartAction(cartActionContainer, p);
+
+    card.appendChild(media);
+    card.appendChild(body);
+    return card;
+  }
+
+  function renderRelated() {
+    const section = document.getElementById("pdp-related-section");
+    const grid = document.getElementById("pdp-related-grid");
+    if (!section || !grid || typeof PRODUCTS === "undefined") return;
+
+    const related = pickRelated(product, PRODUCTS, 4);
+    if (related.length === 0) return;
+
+    grid.innerHTML = "";
+    related.forEach((p) => grid.appendChild(renderRelatedCard(p)));
+    section.hidden = false;
+  }
+
   function render() {
     if (!product) {
       if (notFound) notFound.hidden = false;
@@ -148,6 +252,7 @@
     document.getElementById("pdp-product-price").textContent = formatPrice(product.price, product.currency);
 
     renderCartAction(document.getElementById("pdp-cart-action"), product);
+    renderRelated();
 
     if (loaded) loaded.hidden = false;
 
