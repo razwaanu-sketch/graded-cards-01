@@ -227,7 +227,7 @@ const PRODUCTS = [
     price: 250,
     currency: "GBP",
     image: "images/cards/charizard-v.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/14A8wP1RN6Bv8Yv3qz0oM0h",
     sold: false,
     tags: ["other"]
   },
