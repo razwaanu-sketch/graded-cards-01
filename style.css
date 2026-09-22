@@ -185,7 +185,7 @@ body.drawer-open{overflow:hidden}
 .hero-copy{text-align:left}
 .hero-kicker{font-family:var(--mono);color:var(--gold);font-weight:700;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;margin:0 0 .8rem}
 .hero-title{font-family:var(--font);font-weight:800;font-size:2.1rem;line-height:.98;margin:.2rem 0;color:var(--ink);letter-spacing:-0.03em;display:flex;align-items:center;flex-wrap:wrap;gap:.32em}
-.hero-title-logo{height:.85em;width:.85em;object-fit:contain;flex-shrink:0}
+.hero-title-logo{height:1.35em;width:1.35em;object-fit:contain;flex-shrink:0}
 .hero-sub{color:var(--ink-dim);margin:.8rem 0 0;max-width:46ch}
 
 /* Hero search block */
