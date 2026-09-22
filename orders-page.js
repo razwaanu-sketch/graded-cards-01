@@ -130,7 +130,7 @@
             if (!res.ok) throw new Error("request failed");
             const data = await res.json().catch(() => ({}));
             if (data.email_sent === false) {
-              note.textContent = "Saved, but the shipping email failed to send — check Resend.";
+              note.textContent = `Saved, but the email failed: ${data.email_error || "unknown error"}`;
               note.hidden = false;
               submitBtn.disabled = false;
               return;
