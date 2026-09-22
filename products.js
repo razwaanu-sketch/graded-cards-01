@@ -167,7 +167,7 @@ const PRODUCTS = [
     price: 200,
     currency: "GBP",
     image: "images/cards/mega-gengar-ex-ascended.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/aFa28r6833pj3Eb2mv0oM0d",
     sold: false,
     tags: ["mega-evolution"]
   },
@@ -182,7 +182,7 @@ const PRODUCTS = [
     price: 200,
     currency: "GBP",
     image: "images/cards/ninetales.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/4gMaEXaoj7Fz3Eb1ir0oM0e",
     sold: false,
     tags: ["other"]
   },
@@ -197,7 +197,7 @@ const PRODUCTS = [
     price: 100,
     currency: "GBP",
     image: "images/cards/mewtwo-ex.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/fZu8wPeEz2lf0rZ5yH0oM0f",
     sold: false,
     tags: ["other"]
   },
@@ -212,7 +212,7 @@ const PRODUCTS = [
     price: 100,
     currency: "GBP",
     image: "images/cards/pidgeot-ex.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/aFa7sLcwrgc57Urgdl0oM0g",
     sold: false,
     tags: ["other"]
   },
@@ -227,7 +227,7 @@ const PRODUCTS = [
     price: 250,
     currency: "GBP",
     image: "images/cards/charizard-v.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/14A8wP1RN6Bv8Yv3qz0oM0h",
     sold: false,
     tags: ["other"]
   },
@@ -242,7 +242,7 @@ const PRODUCTS = [
     price: 600,
     currency: "GBP",
     image: "images/cards/charizard-holo-1st-ed.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/aFaeVdeEz5xrfmT6CL0oM0i",
     sold: false,
     tags: ["other"]
   },
@@ -257,7 +257,7 @@ const PRODUCTS = [
     price: 800,
     currency: "GBP",
     image: "images/cards/mega-dragonite-ex.jpg",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/5kQ4gz8gb3pjcaH6CL0oM0j",
     sold: false,
     tags: ["mega-evolution"]
   }
