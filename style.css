@@ -263,6 +263,9 @@ body{
 .payment-badge.pay-apple{background:#000}
 .payment-badge.pay-apple svg{fill:#fff}
 .payment-badge.pay-amazon svg{fill:#131a22}
+.payment-badges-section{text-align:center}
+.payment-badges-title{font-size:1.1rem;margin-bottom:1rem}
+.payment-badges-center{justify-content:center}
 .pdp-notfound{padding:calc(var(--topbar-h) + 120px) 0 80px;text-align:center}
 .pdp-notfound h1{color:var(--gold);margin:0 0 .6rem}
 .pdp-notfound p{color:var(--ink-dim)}
