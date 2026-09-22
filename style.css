@@ -510,7 +510,11 @@ body.drawer-open{overflow:hidden}
   .product-grid{grid-template-columns:repeat(3,1fr)}
   .trust-list{grid-template-columns:repeat(3,1fr)}
   .category-tiles{grid-template-columns:repeat(4,1fr)}
-  .shop-toolbar{flex-direction:row;align-items:center}
+  .shop-toolbar{flex-direction:row;flex-wrap:wrap;align-items:center;gap:14px 18px}
+  .shop-search-form{order:1;flex:0 1 320px}
+  .sort-row{order:2;margin-left:auto}
+  .shop-count{order:3;white-space:nowrap}
+  .shop-filter-row{order:4;flex:1 1 100%}
 }
 
 /* Desktop */
