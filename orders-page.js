@@ -128,6 +128,13 @@
               }),
             });
             if (!res.ok) throw new Error("request failed");
+            const data = await res.json().catch(() => ({}));
+            if (data.email_sent === false) {
+              note.textContent = "Saved, but the shipping email failed to send — check Resend.";
+              note.hidden = false;
+              submitBtn.disabled = false;
+              return;
+            }
             await refresh();
           } catch (err) {
             note.textContent = "Couldn't save that — please try again.";
