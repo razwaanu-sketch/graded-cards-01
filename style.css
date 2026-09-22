@@ -267,9 +267,9 @@ body{
 .pdp-notfound h1{color:var(--gold);margin:0 0 .6rem}
 .pdp-notfound p{color:var(--ink-dim)}
 @media(min-width:780px){
-  .pdp{flex-direction:row;align-items:flex-start;gap:48px;padding-top:8px}
+  .pdp{flex-direction:row;align-items:center;gap:48px;padding-top:8px}
   .pdp-media{flex:1 1 42%;max-width:440px;margin:0}
-  .pdp-info{flex:1 1 50%;margin:0;padding-top:8px}
+  .pdp-info{flex:1 1 50%;margin:0}
 }
 
 /* Sticky "Add to cart" bar — appears once the main CTA on the product page
