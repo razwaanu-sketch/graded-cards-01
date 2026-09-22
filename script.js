@@ -1,7 +1,10 @@
 // Minimal JS for interactions, deferred for performance
 (function(){
   // Year
-  try{ document.getElementById('year').textContent = new Date().getFullYear(); }catch(e){}
+  try{
+    const year = document.getElementById('year');
+    if(year) year.textContent = new Date().getFullYear();
+  }catch(e){}
 
   // Header search toggle
   const searchToggle = document.getElementById('nav-search-toggle');
@@ -59,8 +62,8 @@
   });
 
   // Reveal sections. threshold:0 fires as soon as any part enters view — a
-  // percentage-based threshold can never be met by a section taller than
-  // the viewport (e.g. the shop grid), leaving it permanently invisible.
+  // percentage-based threshold can never be met by a section taller than the
+  // viewport (e.g. the shop grid), leaving it permanently invisible.
   const observer = new IntersectionObserver((entries)=>{
     entries.forEach(entry=>{
       if(entry.isIntersecting){ entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }
@@ -78,7 +81,4 @@
 
   // Keyboard tab indicator
   document.addEventListener('keydown', (e) => { if(e.key === 'Tab') document.body.classList.add('user-is-tabbing'); });
-
-  // Simple lazy image enhancement (already using loading=lazy)
-  // Accessibility: ensure nav links focus
 })();
