@@ -8,9 +8,9 @@
   --bg-card:#1c1b18;
   --line:#3a3835;
   --line-soft:#2b2926;
-  --gold:#d8ab3f;
-  --gold-2:#e7bd57;
-  --gold-ink:#151310;
+  --gold:#3454d6;
+  --gold-2:#5b78e8;
+  --gold-ink:#ffffff;
   --font:"Archivo", Helvetica, Arial, sans-serif;
   --mono:"JetBrains Mono", ui-monospace, monospace;
 
@@ -134,7 +134,7 @@ body{
 .nav-search-form{max-width:var(--max-width);margin:0 auto;padding:12px 14px;display:flex;gap:10px}
 .nav-search-input{flex:1;background:#211f1c;border:1px solid var(--line);border-radius:0;padding:.7rem .85rem;color:var(--ink);font-family:var(--mono);font-size:.82rem}
 .nav-search-input::placeholder{color:var(--ink-faint)}
-.nav-search-input:focus{outline:2px solid rgba(216,171,63,.5)}
+.nav-search-input:focus{outline:2px solid rgba(52,84,214,.5)}
 .nav-search-submit{background:var(--gold);color:var(--gold-ink);border:0;padding:0 14px;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .nav-search-submit svg{width:18px;height:18px}
 
@@ -166,7 +166,7 @@ body.drawer-open{overflow:hidden}
      padded look. Kept low-opacity so it stays behind the hero copy. */
   background-color:var(--bg);
   background-image:
-    radial-gradient(ellipse 900px 480px at 85% -10%, rgba(216,171,63,.12), transparent 60%),
+    radial-gradient(ellipse 900px 480px at 85% -10%, rgba(52,84,214,.12), transparent 60%),
     radial-gradient(circle, rgba(238,231,218,.11) 0, rgba(238,231,218,.11) 1.6px, transparent 3px, transparent 100%),
     radial-gradient(circle, rgba(255,255,255,.045) 0%, transparent 62%),
     repeating-linear-gradient(45deg, rgba(230,222,208,.075) 0 1.3px, transparent 1.3px 63.64px),
@@ -177,8 +177,8 @@ body.drawer-open{overflow:hidden}
 }
 .hero::before{
   content:"";position:absolute;top:0;left:0;right:0;height:2px;z-index:2;
-  background:linear-gradient(90deg, transparent, var(--gold-2) 42%, #fff6de 50%, var(--gold-2) 58%, transparent);
-  box-shadow:0 0 22px 3px rgba(231,189,87,.55);
+  background:linear-gradient(90deg, transparent, var(--gold-2) 42%, #eef1ff 50%, var(--gold-2) 58%, transparent);
+  box-shadow:0 0 22px 3px rgba(91,120,232,.55);
 }
 .container{width:100%;max-width:var(--max-width);margin:0 auto}
 .hero-inner{display:flex;flex-direction:column;gap:32px;align-items:stretch;justify-content:space-between}
@@ -196,7 +196,7 @@ body.drawer-open{overflow:hidden}
   padding:.85rem .9rem;color:var(--ink);font-family:var(--mono);font-size:.82rem;
 }
 .hero-search-input::placeholder, .shop-search-input::placeholder{color:var(--ink-faint)}
-.hero-search-input:focus, .shop-search-input:focus{outline:2px solid rgba(216,171,63,0.5)}
+.hero-search-input:focus, .shop-search-input:focus{outline:2px solid rgba(52,84,214,0.5)}
 .search-btn{white-space:nowrap}
 .tag-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:18px}
 .tag-row-label{font-family:var(--mono);color:var(--ink-faint);font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-right:2px}
@@ -355,7 +355,7 @@ body.drawer-open{overflow:hidden}
   background:#211f1c;border:1px solid var(--line);border-radius:0;color:var(--ink);
   font-family:var(--mono);font-size:.78rem;padding:.55rem .7rem;cursor:pointer;
 }
-.sort-select:focus{outline:2px solid rgba(216,171,63,0.5)}
+.sort-select:focus{outline:2px solid rgba(52,84,214,0.5)}
 .shop-count{font-family:var(--mono);color:var(--ink-faint);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;margin:0}
 .shop-empty{color:var(--ink-dim);text-align:center;padding:32px 0;grid-column:1/-1}
 
@@ -379,7 +379,7 @@ body.drawer-open{overflow:hidden}
 .visits-gate[hidden]{display:none}
 .visits-gate label{color:var(--ink-dim);font-size:.9rem}
 .visits-gate input{background:var(--bg-deep);border:1px solid var(--line);border-radius:0;color:var(--ink);padding:.7rem .8rem;font:inherit}
-.visits-gate input:focus{outline:2px solid rgba(216,171,63,0.45)}
+.visits-gate input:focus{outline:2px solid rgba(52,84,214,0.45)}
 .visits-error{color:#e7b8b8;font-size:.85rem;margin:0}
 .visits-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:0 0 1rem}
 .visit-stat{background:var(--bg-card);border:1px solid var(--line-soft);padding:20px;text-align:center}
@@ -397,7 +397,7 @@ body.drawer-open{overflow:hidden}
   background:var(--bg-deep);border:1px solid var(--line);border-radius:0;
   padding:.7rem .8rem;color:var(--ink);font:inherit;
 }
-.contact-form input:focus, .contact-form textarea:focus{outline:2px solid rgba(216,171,63,0.45)}
+.contact-form input:focus, .contact-form textarea:focus{outline:2px solid rgba(52,84,214,0.45)}
 .contact-form button{align-self:flex-start}
 .contact-form[hidden]{display:none}
 .form-note{font-size:.82rem;color:var(--ink-dim);opacity:.85}
