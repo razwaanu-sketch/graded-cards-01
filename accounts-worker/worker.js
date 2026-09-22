@@ -554,6 +554,7 @@ async function handleAdminShipOrder(request, env) {
   } catch (e) {
     // The tracking info is already saved — a Resend hiccup here shouldn't
     // undo that; the owner can see the email didn't send and retry.
+    console.error(`Shipping email failed for order ${orderId}: ${e.message}`);
     return jsonResponse({ ok: true, email_sent: false });
   }
 
