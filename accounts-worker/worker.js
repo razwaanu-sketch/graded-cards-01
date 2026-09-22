@@ -553,9 +553,12 @@ async function handleAdminShipOrder(request, env) {
     await sendShippingEmail(env, order.customer_email, [order.product_name], trackingNumber, carrier);
   } catch (e) {
     // The tracking info is already saved — a Resend hiccup here shouldn't
-    // undo that; the owner can see the email didn't send and retry.
+    // undo that; the owner can see the email didn't send and retry. The
+    // error message is safe to return here (this endpoint is already
+    // ADMIN_KEY-gated, so only the owner ever sees it) and is far more
+    // reliable than digging through the Workers Logs dashboard.
     console.error(`Shipping email failed for order ${orderId}: ${e.message}`);
-    return jsonResponse({ ok: true, email_sent: false });
+    return jsonResponse({ ok: true, email_sent: false, email_error: e.message });
   }
 
   return jsonResponse({ ok: true, email_sent: true });
