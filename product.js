@@ -47,7 +47,10 @@
     });
   }
 
-  function renderCartAction(container, p) {
+  // `onChange` lets a caller keep more than one instance of this button in
+  // sync (the main CTA and the sticky bar's copy both represent the same
+  // product) — it defaults to just re-rendering this one container.
+  function renderCartAction(container, p, onChange) {
     container.innerHTML = "";
     if (p.sold) {
       const span = document.createElement("span");
@@ -73,9 +76,42 @@
           window.EPSAAnalytics.trackEvent("add_to_cart", { item_id: p.id, item_name: p.name, value: p.price });
         }
       }
-      renderCartAction(container, p);
+      if (onChange) onChange();
+      else renderCartAction(container, p);
     });
     container.appendChild(btn);
+  }
+
+  // Keeps the main product-page CTA and the sticky bar's copy of it in sync
+  // — clicking either one updates both immediately.
+  function renderMainCartActions() {
+    const mainContainer = document.getElementById("pdp-cart-action");
+    const stickyContainer = document.getElementById("pdp-sticky-cart-action");
+    if (mainContainer) renderCartAction(mainContainer, product, renderMainCartActions);
+    if (stickyContainer) renderCartAction(stickyContainer, product, renderMainCartActions);
+  }
+
+  // Shows the sticky bar once the main "Add to cart" button has scrolled out
+  // of view, so buying never requires scrolling back up.
+  function setupStickyBar(p) {
+    const bar = document.getElementById("pdp-sticky-bar");
+    const mainCta = document.getElementById("pdp-cart-action");
+    if (!bar || !mainCta || typeof IntersectionObserver === "undefined") return;
+
+    const thumb = document.getElementById("pdp-sticky-thumb");
+    if (thumb) {
+      thumb.src = p.image;
+      thumb.alt = `${p.name} — ${p.grade} graded Pokémon card, front view`;
+    }
+    const name = document.getElementById("pdp-sticky-name");
+    if (name) name.textContent = p.name;
+    const price = document.getElementById("pdp-sticky-price");
+    if (price) price.textContent = formatPrice(p.price, p.currency);
+
+    const observer = new IntersectionObserver(([entry]) => {
+      bar.hidden = entry.isIntersecting;
+    });
+    observer.observe(mainCta);
   }
 
   function setMetaContent(selector, value) {
@@ -257,7 +293,8 @@
       `${gradingCompany} cert #${product.certNumber} · ${product.grade} ${product.gradeLabel}`;
     document.getElementById("pdp-product-price").textContent = formatPrice(product.price, product.currency);
 
-    renderCartAction(document.getElementById("pdp-cart-action"), product);
+    renderMainCartActions();
+    setupStickyBar(product);
     renderRelated();
 
     if (loaded) loaded.hidden = false;
