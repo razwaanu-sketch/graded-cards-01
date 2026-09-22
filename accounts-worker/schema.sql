@@ -61,6 +61,9 @@ CREATE TABLE IF NOT EXISTS orders (
   currency TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'paid', -- paid | refunded | partially_refunded
   refunded_amount INTEGER NOT NULL DEFAULT 0,
+  tracking_number TEXT,
+  carrier TEXT,
+  shipped_at TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 

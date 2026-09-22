@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Orders — Graded Cards 01</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+</head>
+<body class="theme-dark">
+  <div class="topbar">PSA Authenticated &middot; Secure Stripe Checkout &middot; Fast UK Dispatch</div>
+
+  <header class="site-header" id="top">
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+      <div class="nav-inner">
+        <a class="brand" href="index.html" aria-label="Graded Cards 01">
+          <img class="logo-mark" src="images/logo-mark.png" alt="" aria-hidden="true">
+          <span class="brand-text">Graded Cards 01</span>
+        </a>
+        <div class="nav-actions">
+          <a class="btn-gold" href="index.html#shop">Shop Now</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="page-hero">
+      <h1>Orders</h1>
+      <p>Private order dashboard — not linked anywhere on the site.</p>
+    </section>
+
+    <section class="prose">
+      <div id="orders-gate" class="visits-gate">
+        <label for="orders-key-input">Admin key</label>
+        <input type="password" id="orders-key-input" autocomplete="off" placeholder="Enter admin key">
+        <button type="button" id="orders-unlock-btn" class="btn-gold">Unlock</button>
+        <p id="orders-error" class="visits-error" hidden></p>
+      </div>
+
+      <div id="orders-dash" hidden>
+        <p class="form-note">
+          <button type="button" id="orders-refresh-btn" class="link-btn">Refresh</button> ·
+          <button type="button" id="orders-lock-btn" class="link-btn">Lock</button>
+        </p>
+        <div id="orders-list" class="orders-list"></div>
+        <p id="orders-empty" class="form-note" hidden>No orders yet.</p>
+      </div>
+    </section>
+
+    <footer class="site-footer container" role="contentinfo">
+      <div class="footer-inner">
+        <p>&copy; <span id="year"></span> Graded Cards 01. All rights reserved.</p>
+      </div>
+    </footer>
+  </main>
+
+  <script src="script.js" defer></script>
+  <script src="orders-page.js" defer></script>
+</body>
+</html>
