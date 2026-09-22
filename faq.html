@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Contact — Graded Cards 01</title>
-  <meta name="description" content="Contact Graded Cards 01 with questions about a listing or order." />
-  <meta property="og:title" content="Contact — Graded Cards 01" />
-  <meta property="og:description" content="Contact Graded Cards 01 with questions about a listing or order." />
+  <title>FAQ — Graded Cards 01</title>
+  <meta name="description" content="Answers to common questions about grading, verification, shipping, payment, and returns at Graded Cards 01." />
+  <meta property="og:title" content="FAQ — Graded Cards 01" />
+  <meta property="og:description" content="Answers to common questions about grading, verification, shipping, payment, and returns at Graded Cards 01." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://www.gradedcards01.com/images/og-image.jpg" />
-  <meta property="og:url" content="https://www.gradedcards01.com/contact.html" />
+  <meta property="og:url" content="https://www.gradedcards01.com/faq.html" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://www.gradedcards01.com/images/og-image.jpg" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -82,34 +82,62 @@
 
   <main id="main">
     <section class="page-hero">
-      <h1>Contact Us</h1>
-      <p>Questions about a card, an order, or shipping? We'd love to help.</p>
+      <h1>Frequently Asked Questions</h1>
+      <p>Grading, verification, payment, shipping, and returns</p>
     </section>
 
     <section class="prose">
-      <p style="text-align:center">
-        Email us directly at <a href="mailto:Gradedcards01@outlook.com">Gradedcards01@outlook.com</a>, or use the form below —
-        it will open your email app with your message ready to send.
-      </p>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>Are these cards authentic?</summary>
+          <p>Yes. Every card we list has been graded by a reputable third-party grading company — PSA (Professional Sports Authenticator) or ACE Grading — and each listing shows its grade and certification number.</p>
+        </details>
 
-      <div style="text-align:center; margin: 24px 0 32px;">
-        <p>Ready to complete your payment?</p>
-        <a class="btn-gold" href="https://buy.stripe.com/4gMaEXaoj7Fz3Eb1ir0oM0e" target="_blank" rel="noopener">Pay securely with Stripe</a>
+        <details class="faq-item">
+          <summary>How do I verify a card's grade myself?</summary>
+          <p>Use the certification number on the listing directly with the grading company that issued it: <a href="https://www.psacard.com/cert" target="_blank" rel="noopener">PSA's official cert lookup</a> for PSA-graded cards, or ACE Grading's own certificate verification tool for ACE-graded cards. We'd always encourage you to check independently rather than take our word for it.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>Is each card really one of a kind?</summary>
+          <p>Yes — every listing is a genuine 1-of-1. Once a card sells, its listing is removed from the site rather than restocked.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>What payment methods do you accept?</summary>
+          <p>Checkout is handled securely by Stripe. We accept Visa, Mastercard, and Amex, plus Apple Pay and Amazon Pay — we never see or store your card details.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>Where do you ship, and how much does it cost?</summary>
+          <p>We currently ship to the United Kingdom only, at a flat rate of £10 per order, covering tracked, signed-for, insured delivery. See our <a href="shipping.html">Shipping &amp; Returns</a> page for full details.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>How long until my order ships?</summary>
+          <p>Orders are dispatched within 1–2 business days of payment clearing.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>Will I get tracking information?</summary>
+          <p>Yes — you'll receive an email confirming your order right after checkout, then a second email with your tracking number once it's dispatched.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>Can I return a card?</summary>
+          <p>Because each card is a unique, individually graded item, sales are final once shipped — except where a card arrives materially different from its listing (for example, damaged in transit, or the slab/cert doesn't match the description). Contact us within 48 hours of delivery with photos and we'll work with you on a resolution. Full details are on the <a href="shipping.html">Shipping &amp; Returns</a> page.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>Do I need an account to buy a card?</summary>
+          <p>No — checkout doesn't require an account. Creating one just lets you see your order history and tracking in one place; sign up or log in from the <a href="account.html">Account</a> page.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>Still have a question?</summary>
+          <p><a href="contact.html">Get in touch</a> — we're happy to help with anything about a listing, grading, or an order.</p>
+        </details>
       </div>
-
-      <form class="contact-form" id="contact-form">
-        <label for="name">Name
-          <input type="text" id="name" name="name" required autocomplete="name">
-        </label>
-        <label for="email">Email
-          <input type="email" id="email" name="email" required autocomplete="email">
-        </label>
-        <label for="message">Message
-          <textarea id="message" name="message" rows="5" required></textarea>
-        </label>
-        <button type="submit" class="btn-gold">Send message</button>
-        <p class="form-note">This opens your default email app with your message pre-filled — nothing is sent from this page directly.</p>
-      </form>
     </section>
 
     <footer class="site-footer container" role="contentinfo">
@@ -131,7 +159,6 @@
 
   <script src="cart.js" defer></script>
   <script src="analytics.js" defer></script>
-  <script src="contact.js" defer></script>
   <script src="script.js" defer></script>
   <script src="visits-track.js" defer></script>
 </body>

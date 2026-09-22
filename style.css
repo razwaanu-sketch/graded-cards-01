@@ -367,6 +367,16 @@ body.drawer-open{overflow:hidden}
 .prose h2{color:var(--gold);font-size:1.15rem;font-weight:800;margin:1.8rem 0 .6rem}
 .prose h2:first-child{margin-top:0}
 .prose p, .prose li{color:var(--ink-dim);line-height:1.7}
+
+/* FAQ accordion */
+.faq-list{display:flex;flex-direction:column;gap:10px}
+.faq-item{background:var(--bg-card);border:1px solid var(--line-soft)}
+.faq-item summary{cursor:pointer;padding:16px 18px;color:var(--ink);font-weight:700;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::after{content:"+";color:var(--gold);font-size:1.3rem;font-weight:400;flex-shrink:0;transition:transform .18s var(--ease)}
+.faq-item[open] summary::after{transform:rotate(45deg)}
+.faq-item summary:hover{color:var(--gold)}
+.faq-item p{margin:0;padding:0 18px 16px}
 .prose a{color:var(--gold)}
 .prose .btn-gold{color:var(--gold-ink)}
 .prose .btn-outline, .prose .btn-ghost{color:var(--ink)}
@@ -389,6 +399,20 @@ body.drawer-open{overflow:hidden}
 .visits-recent h2{color:var(--gold);font-size:1rem;font-weight:800;margin:0 0 .6rem}
 .visits-recent-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line-soft);font-family:var(--mono);font-size:.78rem;color:var(--ink-dim)}
 @media(min-width:600px){ .visits-stats{grid-template-columns:repeat(4,1fr)} }
+
+/* Order dashboard */
+.orders-list{display:flex;flex-direction:column;gap:12px;margin-top:1rem}
+.order-row{background:var(--bg-card);border:1px solid var(--line-soft);padding:16px}
+.order-row-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:.72rem;color:var(--ink-dim)}
+.order-row-product{color:var(--ink);font-weight:700;margin:.5rem 0 0}
+.order-row-status{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;padding:.2rem .5rem;white-space:nowrap;height:fit-content}
+.order-row-status.status-paid{color:var(--gold);border:1px solid var(--gold)}
+.order-row-status.status-shipped{color:#7fd88f;border:1px solid #7fd88f}
+.order-row-status.status-refunded{color:var(--ink-faint);border:1px solid var(--line)}
+.ship-form{display:flex;gap:8px;flex-wrap:wrap;margin-top:.7rem;align-items:center}
+.ship-form input{background:var(--bg-deep);border:1px solid var(--line);color:var(--ink);padding:.5rem .7rem;font:inherit;flex:1 1 140px}
+.ship-form input:focus{outline:2px solid rgba(52,84,214,0.45)}
+.order-tracking-info{font-family:var(--mono);font-size:.72rem;color:var(--ink-dim);margin:.5rem 0 0}
 
 /* Contact form */
 .contact-form{display:flex;flex-direction:column;gap:14px;max-width:520px;margin:1.5rem auto 0}

@@ -190,6 +190,39 @@ endpoint). It shows total visits, today, last hour, last 5 minutes, and a
 recent-activity list, refreshing every 5 seconds. Tap "Lock" to forget the
 key on that device (e.g. before handing it to someone else).
 
+## Order-confirmation and shipping emails
+
+Two emails now go out automatically via Resend (the same one used for
+verification/reset emails):
+
+- **Order confirmation** — sent the moment a Stripe `checkout.session.completed`
+  webhook is processed, listing the item(s) and total, with a note that a
+  tracking email follows once it ships. No setup needed beyond the Resend
+  config already in place.
+- **"Your order has shipped"** — sent when you mark an order shipped with a
+  tracking number (see the order dashboard below), including that tracking
+  number and carrier if given.
+
+**If your D1 database already existed before this feature was added**, run
+this once in the D1 Console tab to add the new columns:
+
+```sql
+ALTER TABLE orders ADD COLUMN tracking_number TEXT;
+ALTER TABLE orders ADD COLUMN carrier TEXT;
+ALTER TABLE orders ADD COLUMN shipped_at TEXT;
+```
+
+### Order dashboard (`orders.html`)
+
+A private page for marking orders shipped, gated by the same `ADMIN_KEY`
+secret and `localStorage` key as `visits.html` — if you've already unlocked
+one, the other opens straight to its dashboard on the same device. Open
+`https://www.gradedcards01.com/orders.html` directly (it isn't linked from
+the site). It lists the 100 most recent orders; for any order that isn't
+shipped or refunded yet, enter a tracking number (carrier is optional) and
+tap **"Mark shipped"** — this saves the tracking info and sends the
+shipping email in one step.
+
 ## Reviewing return requests
 
 There's no admin page for this yet — a buyer's return request just creates
@@ -223,5 +256,8 @@ same `sendEmail` helper already in `worker.js`.
   enough return traffic to make the D1 console tedious
 - No notification email to you when a return is requested, or to the buyer
   when its status changes — see the note just above
+- The shipping email is sent manually from `orders.html` once you dispatch
+  an order — there's no courier API integration, so nothing sends it for
+  you automatically
 - Password reset links are single-use and expire in 1 hour; verification
   links expire in 24 hours (resend from the account page if it lapses)

@@ -198,6 +198,47 @@ async function sendPasswordResetEmail(env, userId, email) {
   });
 }
 
+function formatMoney(amount, currency) {
+  try {
+    return new Intl.NumberFormat("en-GB", { style: "currency", currency }).format(amount / 100);
+  } catch (e) {
+    return `${(amount / 100).toFixed(2)} ${currency}`;
+  }
+}
+
+// One email per checkout session (not per line item) — a combined
+// checkout can contain several cards, and the buyer should get a single
+// summary rather than a flood of separate emails.
+async function sendOrderConfirmationEmail(env, email, items) {
+  const rowsHtml = items.map((i) => `<li>${i.name} — ${formatMoney(i.amount, i.currency)}</li>`).join("");
+  const rowsText = items.map((i) => `- ${i.name} — ${formatMoney(i.amount, i.currency)}`).join("\n");
+  const total = formatMoney(
+    items.reduce((sum, i) => sum + i.amount, 0),
+    items[0].currency
+  );
+  await sendEmail(env, {
+    to: email,
+    subject: "Order confirmed — Graded Cards 01",
+    text: `Thanks for your order!\n\n${rowsText}\n\nTotal: ${total}\n\nWe'll email you again with tracking details once it's dispatched.\n\n— Graded Cards 01`,
+    html: `<p>Thanks for your order!</p><ul>${rowsHtml}</ul><p><strong>Total: ${total}</strong></p><p>We'll email you again with tracking details once it's dispatched.</p><p>— Graded Cards 01</p>`,
+  });
+}
+
+async function sendShippingEmail(env, email, productNames, trackingNumber, carrier) {
+  const itemsLine = productNames.join(", ");
+  const trackingLine = carrier
+    ? `Carrier: ${carrier}\nTracking number: ${trackingNumber}`
+    : `Tracking number: ${trackingNumber}`;
+  await sendEmail(env, {
+    to: email,
+    subject: "Your order has shipped — Graded Cards 01",
+    text: `Good news — your order is on its way.\n\nItem(s): ${itemsLine}\n\n${trackingLine}\n\n— Graded Cards 01`,
+    html: `<p>Good news — your order is on its way.</p><p><strong>Item(s):</strong> ${itemsLine}</p><p>${
+      carrier ? `<strong>Carrier:</strong> ${carrier}<br>` : ""
+    }<strong>Tracking number:</strong> ${trackingNumber}</p><p>— Graded Cards 01</p>`,
+  });
+}
+
 async function handleSignup(request, env) {
   const body = await request.json().catch(() => ({}));
   const email = (body.email || "").trim().toLowerCase();
@@ -460,6 +501,65 @@ async function handleVisitStats(request, env) {
   });
 }
 
+// --- Admin: order list + mark-shipped -------------------------------------
+// Same ADMIN_KEY gate as the visit-stats endpoint above. Lets the site
+// owner see recent orders and record a tracking number, which triggers the
+// "Your order has shipped" email to the buyer — see orders.html.
+
+async function handleAdminOrders(request, env) {
+  const url = new URL(request.url);
+  const key = url.searchParams.get("key") || "";
+  if (!env.ADMIN_KEY || !timingSafeEqual(key, env.ADMIN_KEY)) {
+    return jsonResponse({ error: "Unauthorized" }, 403);
+  }
+
+  const { results } = await env.DB.prepare(
+    `SELECT id, customer_email, product_name, amount, currency, status,
+            tracking_number, carrier, shipped_at, created_at
+     FROM orders ORDER BY id DESC LIMIT 100`
+  ).all();
+
+  return jsonResponse({ orders: results || [] });
+}
+
+async function handleAdminShipOrder(request, env) {
+  const body = await request.json().catch(() => ({}));
+  const key = body.key || "";
+  if (!env.ADMIN_KEY || !timingSafeEqual(key, env.ADMIN_KEY)) {
+    return jsonResponse({ error: "Unauthorized" }, 403);
+  }
+
+  const orderId = Number(body.order_id);
+  const trackingNumber = (body.tracking_number || "").trim();
+  const carrier = (body.carrier || "").trim();
+  if (!orderId || !trackingNumber) {
+    return jsonResponse({ error: "order_id and tracking_number are required." }, 400);
+  }
+
+  const order = await env.DB.prepare(
+    "SELECT id, customer_email, product_name FROM orders WHERE id = ?"
+  )
+    .bind(orderId)
+    .first();
+  if (!order) return jsonResponse({ error: "Order not found." }, 404);
+
+  await env.DB.prepare(
+    "UPDATE orders SET tracking_number = ?, carrier = ?, shipped_at = datetime('now') WHERE id = ?"
+  )
+    .bind(trackingNumber, carrier || null, orderId)
+    .run();
+
+  try {
+    await sendShippingEmail(env, order.customer_email, [order.product_name], trackingNumber, carrier);
+  } catch (e) {
+    // The tracking info is already saved — a Resend hiccup here shouldn't
+    // undo that; the owner can see the email didn't send and retry.
+    return jsonResponse({ ok: true, email_sent: false });
+  }
+
+  return jsonResponse({ ok: true, email_sent: true });
+}
+
 // --- Stripe webhook -------------------------------------------------------
 // Verifies the request really came from Stripe (HMAC-SHA256 over the raw
 // body using the endpoint's signing secret) before touching the database.
@@ -566,6 +666,15 @@ async function handleCheckoutCompleted(session, env) {
       )
       .run();
   }
+
+  // A confirmation email is a courtesy, same as the signup/verification
+  // emails — a Resend hiccup shouldn't fail the webhook (Stripe would just
+  // retry it, and the order is already saved either way).
+  try {
+    await sendOrderConfirmationEmail(env, email, items);
+  } catch (e) {
+    console.error(`Order confirmation email failed for session ${session.id}: ${e.message}`);
+  }
 }
 
 // A refund (full or partial) updates every order row that came from the
@@ -625,6 +734,10 @@ export default {
         return await handleTrackVisit(request, env);
       if (url.pathname === "/api/visit-stats" && request.method === "GET")
         return await handleVisitStats(request, env);
+      if (url.pathname === "/api/admin/orders" && request.method === "GET")
+        return await handleAdminOrders(request, env);
+      if (url.pathname === "/api/admin/ship-order" && request.method === "POST")
+        return await handleAdminShipOrder(request, env);
     } catch (e) {
       return jsonResponse({ error: "Server error" }, 500);
     }
