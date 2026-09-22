@@ -253,6 +253,8 @@ body{
 .pdp-trust{list-style:none;margin:2rem 0 0;padding:1.2rem 0 0;border-top:1px solid var(--line-soft);display:flex;flex-direction:column;gap:10px}
 .pdp-trust li{color:var(--ink-dim);font-size:.86rem;padding-left:22px;position:relative}
 .pdp-trust li::before{content:"✓";position:absolute;left:0;color:var(--verified,var(--gold))}
+.payment-badges{display:flex;flex-wrap:wrap;gap:8px;margin:1rem 0 0}
+.payment-badge{display:inline-block;background:var(--bg-card);border:1px solid var(--line-soft);color:var(--ink-dim);font-family:var(--mono);font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.4rem .65rem;border-radius:0}
 .pdp-notfound{padding:calc(var(--topbar-h) + 120px) 0 80px;text-align:center}
 .pdp-notfound h1{color:var(--gold);margin:0 0 .6rem}
 .pdp-notfound p{color:var(--ink-dim)}
