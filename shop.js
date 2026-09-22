@@ -220,12 +220,16 @@
     });
   }
 
-  // Wire search inputs (hero + in-shop toolbar) and tag chip buttons.
+  // Wire search inputs (hero + in-shop toolbar + header) and tag chip buttons.
   document.addEventListener("DOMContentLoaded", () => {
     renderTiles();
     renderGrid();
 
-    document.querySelectorAll(".hero-search-form, .shop-search-form").forEach((form) => {
+    // Arriving from another page's header search (?q=...) filters on load.
+    const urlQuery = new URLSearchParams(location.search).get("q");
+    if (urlQuery) setFilter(activeTag, urlQuery);
+
+    document.querySelectorAll(".hero-search-form, .shop-search-form, .nav-search-form").forEach((form) => {
       form.addEventListener("submit", (e) => {
         e.preventDefault();
         const input = form.querySelector("input[type='search']");

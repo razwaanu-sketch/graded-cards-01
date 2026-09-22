@@ -6,66 +6,49 @@
     if(year) year.textContent = new Date().getFullYear();
   }catch(e){}
 
-  // Mobile navigation. The menu must be taken out of the nav flex row when it
-  // opens; otherwise each link becomes another item in the header and pushes
-  // the logo, cart, and CTA into the page (especially on narrow screens).
-  const toggle = document.querySelector('.nav-toggle');
-  const menu = document.getElementById('nav-menu');
-  const navInner = toggle && toggle.closest('.nav-inner');
-
-  if(toggle && menu){
-    const mobileNavStyles = document.createElement('style');
-    mobileNavStyles.textContent = `
-      @media (max-width: 779px) {
-        .nav-inner { position: relative; }
-        .nav-menu.nav-menu-open {
-          display: flex;
-          position: absolute;
-          top: 100%;
-          left: 0;
-          right: 0;
-          width: 100%;
-          flex-direction: column;
-          align-items: stretch;
-          gap: 0;
-          padding: 8px 18px 18px;
-          background: var(--bg-deep);
-          border-bottom: 1px solid var(--line-soft);
-          box-shadow: 0 14px 24px rgba(0, 0, 0, .28);
-          z-index: 10;
-        }
-        .nav-menu.nav-menu-open li a {
-          display: block;
-          padding: 12px 0;
-          border-top: 1px solid var(--line-soft);
-        }
+  // Header search toggle
+  const searchToggle = document.getElementById('nav-search-toggle');
+  const searchBar = document.getElementById('nav-search-bar');
+  if(searchToggle && searchBar){
+    searchToggle.addEventListener('click', () => {
+      const open = searchToggle.getAttribute('aria-expanded') === 'true';
+      searchToggle.setAttribute('aria-expanded', String(!open));
+      searchBar.hidden = open;
+      if(!open){
+        const input = searchBar.querySelector('input[type="search"]');
+        if(input) input.focus();
       }
-    `;
-    document.head.appendChild(mobileNavStyles);
-
-    const closeMenu = () => {
-      toggle.setAttribute('aria-expanded', 'false');
-      menu.classList.remove('nav-menu-open');
-    };
-
-    toggle.addEventListener('click', () => {
-      const isOpen = toggle.getAttribute('aria-expanded') === 'true';
-      if(isOpen) closeMenu();
-      else {
-        if(navInner) navInner.style.position = 'relative';
-        toggle.setAttribute('aria-expanded', 'true');
-        menu.classList.add('nav-menu-open');
-      }
-    });
-
-    menu.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
-    document.addEventListener('keydown', event => {
-      if(event.key === 'Escape') closeMenu();
-    });
-    window.addEventListener('resize', () => {
-      if(window.innerWidth >= 780) closeMenu();
     });
   }
+
+  // Menu drawer
+  const menuToggle = document.getElementById('nav-menu-toggle');
+  const drawer = document.getElementById('nav-drawer');
+  const drawerOverlay = document.getElementById('nav-drawer-overlay');
+  const drawerClose = document.getElementById('nav-drawer-close');
+  function openDrawer(){
+    if(!drawer || !drawerOverlay) return;
+    drawer.classList.add('is-open');
+    drawerOverlay.hidden = false;
+    drawer.setAttribute('aria-hidden', 'false');
+    if(menuToggle) menuToggle.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('drawer-open');
+  }
+  function closeDrawer(){
+    if(!drawer || !drawerOverlay) return;
+    drawer.classList.remove('is-open');
+    drawerOverlay.hidden = true;
+    drawer.setAttribute('aria-hidden', 'true');
+    if(menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('drawer-open');
+  }
+  if(menuToggle) menuToggle.addEventListener('click', () => {
+    if(drawer && drawer.classList.contains('is-open')) closeDrawer(); else openDrawer();
+  });
+  if(drawerClose) drawerClose.addEventListener('click', closeDrawer);
+  if(drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
+  if(drawer) drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', closeDrawer));
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') closeDrawer(); });
 
   // Smooth internal links
   document.querySelectorAll('a[href^="#"]').forEach(a=>{
@@ -73,11 +56,7 @@
       const href = a.getAttribute('href');
       if(href.length > 1){
         const el = document.querySelector(href);
-        if(el){
-          e.preventDefault();
-          el.scrollIntoView({behavior:'smooth', block:'start'});
-          if(window.innerWidth < 780 && toggle && toggle.getAttribute('aria-expanded') === 'true') toggle.click();
-        }
+        if(el){ e.preventDefault(); el.scrollIntoView({behavior:'smooth', block:'start'}); }
       }
     });
   });

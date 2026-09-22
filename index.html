@@ -39,26 +39,55 @@
           <span class="brand-text">Graded Cards 01</span>
         </a>
 
-        <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Toggle navigation">
-          <span class="hamburger"></span>
-        </button>
-
-        <ul class="nav-menu" id="nav-menu">
-          <li><a href="#shop">Shop</a></li>
-          <li><a href="sealed.html">Sealed Product</a></li>
-          <li><a href="raw-cards.html">Raw Cards</a></li>
-          <li><a href="about.html">About</a></li>
-          <li><a href="shipping.html">Shipping</a></li>
-          <li><a href="contact.html">Contact</a></li>
-          <li><a href="account.html">Account</a></li>
-        </ul>
-
-        <div class="nav-actions">
-          <a class="btn-gold" href="#shop">Shop Now</a>
+        <div class="nav-icons">
+          <a class="nav-icon-btn" href="cart.html" aria-label="View cart">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 8h11l1 12.5h-13z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>
+            <span class="cart-count nav-cart-count" hidden>0</span>
+          </a>
+          <a class="nav-icon-btn" href="account.html" aria-label="Account">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.2" r="3.4"/><path d="M5 20c1.1-4.2 3.9-6.4 7-6.4s5.9 2.2 7 6.4"/></svg>
+          </a>
+          <button type="button" class="nav-icon-btn" id="nav-search-toggle" aria-label="Search" aria-expanded="false" aria-controls="nav-search-bar">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m20 20-4.6-4.6"/></svg>
+          </button>
+          <button type="button" class="nav-icon-btn nav-menu-btn" id="nav-menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-drawer">
+            <span class="hamburger"></span>
+            <span class="nav-menu-label">Menu</span>
+          </button>
         </div>
+      </div>
+
+      <div class="nav-search-bar" id="nav-search-bar" hidden>
+        <form class="nav-search-form" role="search" aria-label="Search cards" action="index.html">
+          <input type="search" name="q" class="nav-search-input" placeholder="Search cards…" aria-label="Search cards" autocomplete="off">
+          <button type="submit" class="nav-search-submit" aria-label="Submit search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m20 20-4.6-4.6"/></svg>
+          </button>
+        </form>
       </div>
     </nav>
   </header>
+
+  <div class="nav-drawer-overlay" id="nav-drawer-overlay" hidden></div>
+  <aside class="nav-drawer" id="nav-drawer" aria-hidden="true" aria-label="Site menu">
+    <div class="nav-drawer-top">
+      <span class="nav-drawer-title">Menu</span>
+      <button type="button" class="nav-drawer-close" id="nav-drawer-close" aria-label="Close menu">&times;</button>
+    </div>
+    <div class="nav-drawer-account">
+      <a href="account.html">Sign In</a>
+      <a href="account.html">My Orders</a>
+    </div>
+    <ul class="nav-drawer-links">
+      <li><a href="#shop">Shop</a></li>
+      <li><a href="sealed.html">Sealed Product</a></li>
+      <li><a href="raw-cards.html">Raw Cards</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="shipping.html">Shipping</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="account.html">Account</a></li>
+    </ul>
+  </aside>
 
   <main id="main">
     <section class="hero" aria-labelledby="hero-heading">
