@@ -3,19 +3,49 @@
   // Year
   try{ document.getElementById('year').textContent = new Date().getFullYear(); }catch(e){}
 
-  // Nav toggle
-  const toggle = document.querySelector('.nav-toggle');
-  const menu = document.getElementById('nav-menu');
-  if(toggle){
-    toggle.addEventListener('click', () => {
-      const expanded = toggle.getAttribute('aria-expanded') === 'true';
-      toggle.setAttribute('aria-expanded', String(!expanded));
-      if(menu){
-        if(expanded){ menu.style.display = ''; }
-        else{ menu.style.display = 'flex'; menu.style.flexDirection = 'column'; }
+  // Header search toggle
+  const searchToggle = document.getElementById('nav-search-toggle');
+  const searchBar = document.getElementById('nav-search-bar');
+  if(searchToggle && searchBar){
+    searchToggle.addEventListener('click', () => {
+      const open = searchToggle.getAttribute('aria-expanded') === 'true';
+      searchToggle.setAttribute('aria-expanded', String(!open));
+      searchBar.hidden = open;
+      if(!open){
+        const input = searchBar.querySelector('input[type="search"]');
+        if(input) input.focus();
       }
     });
   }
+
+  // Menu drawer
+  const menuToggle = document.getElementById('nav-menu-toggle');
+  const drawer = document.getElementById('nav-drawer');
+  const drawerOverlay = document.getElementById('nav-drawer-overlay');
+  const drawerClose = document.getElementById('nav-drawer-close');
+  function openDrawer(){
+    if(!drawer || !drawerOverlay) return;
+    drawer.classList.add('is-open');
+    drawerOverlay.hidden = false;
+    drawer.setAttribute('aria-hidden', 'false');
+    if(menuToggle) menuToggle.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('drawer-open');
+  }
+  function closeDrawer(){
+    if(!drawer || !drawerOverlay) return;
+    drawer.classList.remove('is-open');
+    drawerOverlay.hidden = true;
+    drawer.setAttribute('aria-hidden', 'true');
+    if(menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('drawer-open');
+  }
+  if(menuToggle) menuToggle.addEventListener('click', () => {
+    if(drawer && drawer.classList.contains('is-open')) closeDrawer(); else openDrawer();
+  });
+  if(drawerClose) drawerClose.addEventListener('click', closeDrawer);
+  if(drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
+  if(drawer) drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', closeDrawer));
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') closeDrawer(); });
 
   // Smooth internal links
   document.querySelectorAll('a[href^="#"]').forEach(a=>{
@@ -23,9 +53,7 @@
       const href = a.getAttribute('href');
       if(href.length > 1){
         const el = document.querySelector(href);
-        if(el){ e.preventDefault(); el.scrollIntoView({behavior:'smooth', block:'start'});
-          if(window.innerWidth < 780 && menu && toggle && toggle.getAttribute('aria-expanded') === 'true') toggle.click();
-        }
+        if(el){ e.preventDefault(); el.scrollIntoView({behavior:'smooth', block:'start'}); }
       }
     });
   });
