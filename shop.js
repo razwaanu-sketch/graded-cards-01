@@ -130,11 +130,6 @@
     price.textContent = formatPrice(product.price, product.currency);
     footer.appendChild(price);
 
-    const oneOf = document.createElement("span");
-    oneOf.className = "oneof";
-    oneOf.textContent = "1 of 1";
-    footer.appendChild(oneOf);
-
     body.appendChild(title);
     body.appendChild(meta);
     body.appendChild(cert);
