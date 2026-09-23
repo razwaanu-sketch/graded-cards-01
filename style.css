@@ -412,9 +412,12 @@ body.drawer-open{overflow:hidden}
 .order-row-status.status-shipped{color:#7fd88f;border:1px solid #7fd88f}
 .order-row-status.status-refunded{color:var(--ink-faint);border:1px solid var(--line)}
 .ship-form{display:flex;gap:8px;flex-wrap:wrap;margin-top:.7rem;align-items:center}
-.ship-form input{background:var(--bg-deep);border:1px solid var(--line);color:var(--ink);padding:.5rem .7rem;font:inherit;flex:1 1 140px}
-.ship-form input:focus{outline:2px solid rgba(52,84,214,0.45)}
+.ship-form input[type="text"]{background:var(--bg-deep);border:1px solid var(--line);color:var(--ink);padding:.5rem .7rem;font:inherit;flex:1 1 140px}
+.ship-form input[type="text"]:focus{outline:2px solid rgba(52,84,214,0.45)}
+.ship-form-photo-check{display:flex;align-items:center;gap:6px;color:var(--ink-dim);font-size:.78rem;flex:0 0 auto;white-space:nowrap;cursor:pointer}
+.ship-form-photo-check input{width:auto}
 .order-tracking-info{font-family:var(--mono);font-size:.72rem;color:var(--ink-dim);margin:.5rem 0 0}
+.order-photo-missing{color:#e7b8b8}
 
 /* Contact form */
 .contact-form{display:flex;flex-direction:column;gap:14px;max-width:520px;margin:1.5rem auto 0}

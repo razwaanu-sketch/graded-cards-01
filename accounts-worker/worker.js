@@ -535,7 +535,7 @@ async function handleAdminOrders(request, env) {
 
   const { results } = await env.DB.prepare(
     `SELECT id, customer_email, product_name, amount, currency, status,
-            tracking_number, carrier, shipped_at, created_at
+            tracking_number, carrier, shipped_at, dispatch_photo_taken, created_at
      FROM orders ORDER BY id DESC LIMIT 100`
   ).all();
 
@@ -552,6 +552,7 @@ async function handleAdminShipOrder(request, env) {
   const orderId = Number(body.order_id);
   const trackingNumber = (body.tracking_number || "").trim();
   const carrier = (body.carrier || "").trim();
+  const dispatchPhotoTaken = body.dispatch_photo_taken ? 1 : 0;
   if (!orderId || !trackingNumber) {
     return jsonResponse({ error: "order_id and tracking_number are required." }, 400);
   }
@@ -564,9 +565,9 @@ async function handleAdminShipOrder(request, env) {
   if (!order) return jsonResponse({ error: "Order not found." }, 404);
 
   await env.DB.prepare(
-    "UPDATE orders SET tracking_number = ?, carrier = ?, shipped_at = datetime('now') WHERE id = ?"
+    "UPDATE orders SET tracking_number = ?, carrier = ?, shipped_at = datetime('now'), dispatch_photo_taken = ? WHERE id = ?"
   )
-    .bind(trackingNumber, carrier || null, orderId)
+    .bind(trackingNumber, carrier || null, dispatchPhotoTaken, orderId)
     .run();
 
   try {
