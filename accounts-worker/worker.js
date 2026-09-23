@@ -464,6 +464,26 @@ async function handleCreateReturn(request, env) {
   return jsonResponse({ ok: true });
 }
 
+// --- Public sales stats -----------------------------------------------------
+// A small, genuinely-sourced social-proof line for the storefront (how many
+// cards have actually sold, and when the last one went) — no PII, just a
+// count and a timestamp. Excludes refunded orders (not a completed sale)
+// and the one-off £1 "Test" order used to verify the checkout/email
+// pipeline, so the number stays honest.
+
+async function handlePublicStats(request, env) {
+  const row = await env.DB.prepare(
+    `SELECT COUNT(*) AS sold_count, MAX(created_at) AS last_sale_at
+     FROM orders
+     WHERE status != 'refunded' AND product_name != 'Test'`
+  ).first();
+
+  return jsonResponse({
+    sold_count: row.sold_count || 0,
+    last_sale_at: row.last_sale_at || null,
+  });
+}
+
 // --- Site visit tracking ---------------------------------------------------
 // Anonymous, cookie-free pageview log for the site owner's private traffic
 // dashboard (visits.html, not linked anywhere on the storefront). Writes are
@@ -734,6 +754,8 @@ export default {
         return await handleResetPassword(request, env);
       if (url.pathname === "/api/stripe-webhook" && request.method === "POST")
         return await handleStripeWebhook(request, env);
+      if (url.pathname === "/api/public-stats" && request.method === "GET")
+        return await handlePublicStats(request, env);
       if (url.pathname === "/api/track-visit" && request.method === "POST")
         return await handleTrackVisit(request, env);
       if (url.pathname === "/api/visit-stats" && request.method === "GET")

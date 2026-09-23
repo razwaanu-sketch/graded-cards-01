@@ -216,6 +216,8 @@ body.drawer-open{overflow:hidden}
 .section{padding:44px 18px}
 .section-title{font-family:var(--font);font-size:1.7rem;font-weight:800;letter-spacing:-0.02em;color:var(--gold);margin:0 0 .5rem}
 .lede{color:var(--ink-dim);margin:0 0 1.2rem;max-width:52ch}
+.sales-stat{display:inline-block;color:var(--gold);font-family:var(--mono);font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:0 0 1.2rem;padding:.4rem .8rem;border:1px solid var(--gold)}
+.sales-stat[hidden]{display:none}
 
 /* Product grid */
 .product-grid{
