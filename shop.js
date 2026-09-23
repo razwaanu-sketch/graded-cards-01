@@ -220,22 +220,6 @@
     renderTiles();
     renderGrid();
 
-    // Hero showcase caption reads the live price, cert and sold state.
-    document.querySelectorAll("[data-hero-product]").forEach((el) => {
-      const p = PRODUCTS.find((x) => x.id === el.getAttribute("data-hero-product"));
-      if (!p) return;
-      const [company, grade] = p.grade.split(" ");
-      const name = el.querySelector(".hsc-name");
-      const cert = el.querySelector(".hsc-cert");
-      const price = el.querySelector(".hsc-price");
-      if (name) name.textContent = `${p.name} · ${company} ${grade}`;
-      if (cert) cert.textContent = `Cert #${p.certNumber}`;
-      if (price) {
-        price.textContent = p.sold ? "Sold" : formatPrice(p.price, p.currency);
-        price.classList.toggle("is-sold", !!p.sold);
-      }
-    });
-
     // Arriving from another page's header search (?q=...) filters on load.
     const urlQuery = new URLSearchParams(location.search).get("q");
     if (urlQuery) setFilter(activeTag, urlQuery);
