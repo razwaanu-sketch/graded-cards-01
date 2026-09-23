@@ -96,9 +96,17 @@
         it's on the way.
       </p>
       <p style="text-align:center">
-        Want to know the moment it's live? <a href="contact.html">Get in touch</a> and we'll let you know, or
+        Want to know the moment it's live? Leave your email and we'll let you know, or
         <a href="index.html#shop">browse our graded cards</a> in the meantime.
       </p>
+      <div class="notify-box">
+        <form class="notify-form" aria-label="Get new-card alerts">
+          <input type="email" required placeholder="Your email address" aria-label="Email address" autocomplete="email">
+          <button type="submit" class="btn-gold">Notify me</button>
+        </form>
+        <p class="notify-msg" hidden></p>
+        <p class="notify-note">One email when new cards go live. Unsubscribe any time. <a href="privacy.html">Privacy policy</a></p>
+      </div>
     </section>
 
     <footer class="site-footer container" role="contentinfo">
@@ -121,6 +129,7 @@
   <script src="cart.js" defer></script>
   <script src="analytics.js" defer></script>
   <script src="script.js" defer></script>
+  <script src="notify.js" defer></script>
   <script src="visits-track.js" defer></script>
 </body>
 </html>
