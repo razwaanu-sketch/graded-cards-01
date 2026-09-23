@@ -371,6 +371,8 @@ body.drawer-open{overflow:hidden}
 .faq-item p{margin:0;padding:0 18px 16px}
 .prose a{color:var(--link)}
 .prose a:hover, .prose a:focus{color:var(--ink)}
+.cancel-form{margin:0 0 1.2rem;padding:16px 18px;background:var(--bg-card);border:1px solid var(--line);font-family:var(--mono);font-size:.8rem;line-height:1.8;color:var(--ink-dim);overflow-wrap:anywhere}
+.form-note a{color:var(--link)}
 .prose .btn-gold{color:var(--gold-ink)}
 .prose .btn-outline, .prose .btn-ghost{color:var(--ink)}
 .coming-soon-badge{display:inline-block;background:var(--bg-card);border:1px solid var(--gold);color:var(--gold);font-family:var(--mono);font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:.5rem 1.1rem;margin:.5rem 0 1.4rem}
