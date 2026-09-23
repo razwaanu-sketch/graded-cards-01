@@ -23,6 +23,7 @@ link is shared. They're generated from `product.html` and `products.js` by
 `tools/build_card_pages.py`, and the "Card share pages" GitHub Action reruns it on every push that
 changes `products.js`, `product.html` or a card photo. Don't edit the `card-*.html` files by hand.
 To rebuild manually: `pip install Pillow`, then `python3 tools/build_card_pages.py`.
+The same script writes `sitemap.xml` and `google-merchant-feed.xml`. See `GOOGLE-SETUP.md`.
 
 ## Getting fully live
 

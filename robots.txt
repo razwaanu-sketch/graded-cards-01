@@ -1,0 +1,7 @@
+# Graded Cards 01
+# Everything public can be crawled. Private and utility pages carry a
+# noindex tag instead of being blocked here, so search engines can see it.
+User-agent: *
+Allow: /
+
+Sitemap: https://www.gradedcards01.com/sitemap.xml

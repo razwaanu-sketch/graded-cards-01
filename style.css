@@ -297,6 +297,11 @@ body.drawer-open{overflow:hidden}
 .pdp-notfound{padding:64px 0 80px;text-align:center}
 .pdp-notfound h1{color:var(--gold);margin:0 0 .6rem}
 .pdp-notfound p{color:var(--ink-dim)}
+.notfound-body{text-align:center}
+.notfound-search{max-width:520px;margin:8px auto 24px}
+.notfound-search .shop-search-input{min-width:0}
+.notfound-actions{margin:0 0 28px}
+.notfound-actions .btn-gold{display:inline-block}
 @media(min-width:780px){
   .pdp{flex-direction:row;align-items:center;gap:48px;padding-top:8px}
   .pdp-media{flex:1 1 42%;max-width:440px;margin:0}
