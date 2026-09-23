@@ -291,6 +291,19 @@
     const gradingCompany = product.grade.split(" ")[0];
     document.getElementById("pdp-product-cert").textContent =
       `${gradingCompany} cert #${product.certNumber} · ${product.grade} ${product.gradeLabel}`;
+
+    // Links straight to the grader's own record for this cert, so a buyer
+    // can confirm the card is genuine without taking our word for it.
+    const certUrls = {
+      PSA: (n) => `https://www.psacard.com/cert/${encodeURIComponent(n)}`,
+      ACE: (n) => `https://acegrading.com/cert/${encodeURIComponent(n)}`,
+    };
+    const verifyLink = document.getElementById("pdp-verify");
+    if (verifyLink && certUrls[gradingCompany]) {
+      verifyLink.href = certUrls[gradingCompany](product.certNumber);
+      verifyLink.textContent = `Verify this cert on ${gradingCompany}'s website ↗`;
+      verifyLink.hidden = false;
+    }
     document.getElementById("pdp-product-price").textContent = formatPrice(product.price, product.currency);
 
     renderMainCartActions();
