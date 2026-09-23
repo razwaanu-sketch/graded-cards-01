@@ -476,6 +476,146 @@ async function handleCreateReturn(request, env) {
   return jsonResponse({ ok: true });
 }
 
+// --- New-card alerts --------------------------------------------------------
+// Double opt-in list for "new cards added" emails. Confirm and unsubscribe
+// links point at notify.html on the site, which only POSTs here after the
+// person clicks a button: mail scanners that prefetch every link in an
+// email would otherwise silently confirm (or unsubscribe) people.
+
+const CONFIRM_RESEND_MINUTES = 10;
+
+async function sendSubscribeConfirmEmail(env, email, token) {
+  const link = `${SITE_ORIGIN}/notify.html?action=confirm&token=${token}`;
+  await sendEmail(env, {
+    to: email,
+    subject: "Confirm new-card alerts — Graded Cards 01",
+    text: `Confirm you'd like an email from Graded Cards 01 when new cards are added: ${link}\n\nIf you didn't ask for this, ignore this email and you won't hear from us.`,
+    html: `<p>Confirm you'd like an email from Graded Cards 01 when new cards are added:</p><p><a href="${link}">Confirm my alerts</a></p><p>If you didn't ask for this, ignore this email and you won't hear from us.</p>`,
+  });
+}
+
+async function handleSubscribe(request, env) {
+  const body = await request.json().catch(() => ({}));
+  const email = (body.email || "").trim().toLowerCase();
+  if (!isValidEmail(email)) return jsonResponse({ error: "Enter a valid email address." }, 400);
+
+  // Same response whether the address is new, pending or already
+  // confirmed, so this can't be used to check who's on the list.
+  const ok = jsonResponse({ ok: true });
+
+  const existing = await env.DB.prepare(
+    `SELECT token, confirmed,
+            confirm_sent_at > datetime('now', '-${CONFIRM_RESEND_MINUTES} minutes') AS recently_sent
+     FROM subscribers WHERE email = ?`
+  )
+    .bind(email)
+    .first();
+  // Throttled so the form can't be used to flood someone's inbox.
+  if (existing && (existing.confirmed || existing.recently_sent)) return ok;
+
+  const token = existing ? existing.token : generateToken();
+  if (existing) {
+    await env.DB.prepare("UPDATE subscribers SET confirm_sent_at = datetime('now') WHERE email = ?").bind(email).run();
+  } else {
+    await env.DB.prepare("INSERT INTO subscribers (email, token, confirm_sent_at) VALUES (?, ?, datetime('now'))")
+      .bind(email, token)
+      .run();
+  }
+
+  try {
+    await sendSubscribeConfirmEmail(env, email, token);
+  } catch (e) {
+    console.error(`Subscribe confirmation email failed: ${e.message}`);
+    await env.DB.prepare("UPDATE subscribers SET confirm_sent_at = NULL WHERE email = ?").bind(email).run();
+    return jsonResponse({ error: "Couldn't send the confirmation email right now. Please try again shortly." }, 502);
+  }
+  return ok;
+}
+
+async function handleSubscription(request, env) {
+  const body = await request.json().catch(() => ({}));
+  const token = typeof body.token === "string" ? body.token : "";
+  const action = body.action;
+  if (!token || (action !== "confirm" && action !== "unsubscribe")) {
+    return jsonResponse({ error: "This link is invalid." }, 400);
+  }
+
+  const sub = await env.DB.prepare("SELECT id FROM subscribers WHERE token = ?").bind(token).first();
+
+  if (action === "unsubscribe") {
+    // Deleted outright rather than flagged, so nothing is kept about
+    // someone who has opted out. Succeeds even if already gone.
+    if (sub) await env.DB.prepare("DELETE FROM subscribers WHERE id = ?").bind(sub.id).run();
+    return jsonResponse({ ok: true });
+  }
+
+  if (!sub) return jsonResponse({ error: "This link is invalid, or you've since unsubscribed." }, 404);
+  await env.DB.prepare(
+    "UPDATE subscribers SET confirmed = 1, confirmed_at = COALESCE(confirmed_at, datetime('now')) WHERE id = ?"
+  )
+    .bind(sub.id)
+    .run();
+  return jsonResponse({ ok: true });
+}
+
+function buildAlertEmail(env, subscriber, subject, message) {
+  const unsubscribeLink = `${SITE_ORIGIN}/notify.html?action=unsubscribe&token=${subscriber.token}`;
+  const shopLink = `${SITE_ORIGIN}/#shop`;
+  return {
+    from: env.EMAIL_FROM,
+    to: subscriber.email,
+    subject,
+    headers: { "List-Unsubscribe": `<${unsubscribeLink}>` },
+    text: `${message}\n\nSee the collection: ${shopLink}\n\n—\nYou're getting this because you asked for new-card alerts from Graded Cards 01. Unsubscribe: ${unsubscribeLink}`,
+    html: `<p>${escapeHtml(message).replace(/\n/g, "<br>")}</p><p><a href="${shopLink}">See the collection</a></p><p style="color:#888;font-size:12px">You're getting this because you asked for new-card alerts from Graded Cards 01. <a href="${unsubscribeLink}">Unsubscribe</a></p>`,
+  };
+}
+
+async function handleAdminSubscribers(request, env) {
+  const url = new URL(request.url);
+  const key = url.searchParams.get("key") || "";
+  if (!env.ADMIN_KEY || !timingSafeEqual(key, env.ADMIN_KEY)) {
+    return jsonResponse({ error: "Unauthorized" }, 403);
+  }
+  const row = await env.DB.prepare(
+    "SELECT SUM(confirmed = 1) AS confirmed, SUM(confirmed = 0) AS pending FROM subscribers"
+  ).first();
+  return jsonResponse({ confirmed: row.confirmed || 0, pending: row.pending || 0 });
+}
+
+async function handleAdminSendAlert(request, env) {
+  const body = await request.json().catch(() => ({}));
+  const key = body.key || "";
+  if (!env.ADMIN_KEY || !timingSafeEqual(key, env.ADMIN_KEY)) {
+    return jsonResponse({ error: "Unauthorized" }, 403);
+  }
+  const subject = (body.subject || "").trim().slice(0, 150);
+  const message = (body.message || "").trim().slice(0, 5000);
+  if (!subject || !message) return jsonResponse({ error: "A subject and a message are both required." }, 400);
+
+  const { results } = await env.DB.prepare("SELECT email, token FROM subscribers WHERE confirmed = 1").all();
+  const subscribers = results || [];
+
+  // Resend's batch endpoint takes up to 100 emails per call, which keeps
+  // this well inside both Resend's rate limit and the Worker's
+  // subrequest limit. Each subscriber still gets their own email, with
+  // their own unsubscribe link.
+  let sent = 0;
+  const errors = [];
+  for (let i = 0; i < subscribers.length; i += 100) {
+    const chunk = subscribers.slice(i, i + 100);
+    const res = await fetch("https://api.resend.com/emails/batch", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify(chunk.map((s) => buildAlertEmail(env, s, subject, message))),
+    });
+    if (res.ok) sent += chunk.length;
+    else errors.push(`Resend API error ${res.status}: ${await res.text().catch(() => "")}`);
+  }
+
+  return jsonResponse({ ok: errors.length === 0, total: subscribers.length, sent, errors });
+}
+
 // --- Public sales stats -----------------------------------------------------
 // A small, genuinely-sourced social-proof line for the storefront (how many
 // cards have actually sold, and when the last one went) — no PII, just a
@@ -770,6 +910,14 @@ export default {
         return await handleStripeWebhook(request, env);
       if (url.pathname === "/api/public-stats" && request.method === "GET")
         return await handlePublicStats(request, env);
+      if (url.pathname === "/api/subscribe" && request.method === "POST")
+        return await handleSubscribe(request, env);
+      if (url.pathname === "/api/subscription" && request.method === "POST")
+        return await handleSubscription(request, env);
+      if (url.pathname === "/api/admin/subscribers" && request.method === "GET")
+        return await handleAdminSubscribers(request, env);
+      if (url.pathname === "/api/admin/send-alert" && request.method === "POST")
+        return await handleAdminSendAlert(request, env);
       if (url.pathname === "/api/track-visit" && request.method === "POST")
         return await handleTrackVisit(request, env);
       if (url.pathname === "/api/visit-stats" && request.method === "GET")

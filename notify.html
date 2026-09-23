@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Raw Cards — Graded Cards 01</title>
-  <meta name="description" content="Raw, ungraded Pokémon cards from Graded Cards 01 — coming soon." />
-  <meta property="og:title" content="Raw Cards — Graded Cards 01" />
-  <meta property="og:description" content="Raw, ungraded Pokémon cards from Graded Cards 01 — coming soon." />
+  <title>New-card alerts — Graded Cards 01</title>
+  <meta name="description" content="Get an email when new graded Pokémon cards are added to Graded Cards 01." />
+  <meta property="og:title" content="New-card alerts — Graded Cards 01" />
+  <meta property="og:description" content="Get an email when new graded Pokémon cards are added to Graded Cards 01." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://www.gradedcards01.com/images/og-image.jpg" />
-  <meta property="og:url" content="https://www.gradedcards01.com/raw-cards.html" />
+  <meta property="og:url" content="https://www.gradedcards01.com/notify.html" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://www.gradedcards01.com/images/og-image.jpg" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -82,23 +82,13 @@
 
   <main id="main">
     <section class="page-hero">
-      <h1>Raw Cards</h1>
-      <p>Ungraded singles from recent sets</p>
+      <h1>New-card alerts</h1>
+      <p>Be first to know when new graded cards go live</p>
     </section>
 
     <section class="prose">
-      <p style="text-align:center">
-        <span class="coming-soon-badge">Coming soon</span>
-      </p>
-      <p>
-        Alongside our graded slabs, we're building out a selection of raw (ungraded) Pokémon singles for collectors
-        who want to grade their own cards or simply prefer them out of the case. Nothing is listed yet, but it's on
-        the way.
-      </p>
-      <p style="text-align:center">
-        Want to know the moment it's live? Leave your email and we'll let you know, or
-        <a href="index.html#shop">browse our graded cards</a> in the meantime.
-      </p>
+      <div id="notify-signup">
+      <p style="text-align:center">Every card here is a 1-of-1, and the best ones go quickly. Leave your email and we'll send you one short email each time new cards are added.</p>
       <div class="notify-box">
         <form class="notify-form" aria-label="Get new-card alerts">
           <input type="email" required placeholder="Your email address" aria-label="Email address" autocomplete="email">
@@ -106,6 +96,13 @@
         </form>
         <p class="notify-msg" hidden></p>
         <p class="notify-note">One email when new cards go live. Unsubscribe any time. <a href="privacy.html">Privacy policy</a></p>
+      </div>
+      </div>
+
+      <div id="notify-action" class="notify-action" hidden>
+        <h2 id="notify-action-title"></h2>
+        <button type="button" id="notify-action-btn" class="btn-gold"></button>
+        <p id="notify-action-msg" class="notify-msg" hidden></p>
       </div>
     </section>
 

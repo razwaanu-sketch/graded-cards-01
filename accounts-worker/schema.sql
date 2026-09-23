@@ -100,3 +100,19 @@ CREATE TABLE IF NOT EXISTS page_views (
 );
 
 CREATE INDEX IF NOT EXISTS idx_page_views_created ON page_views(created_at);
+
+-- "New cards added" email alerts. Double opt-in: a row starts unconfirmed
+-- and only receives alerts once the owner of the address clicks the
+-- emailed confirmation link, so nobody can sign someone else up. The
+-- token is stored raw (unlike session/email tokens) because every alert
+-- has to embed it in that subscriber's unsubscribe link; the worst it
+-- can do if leaked is confirm or unsubscribe that one address.
+CREATE TABLE IF NOT EXISTS subscribers (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT NOT NULL UNIQUE,
+  token TEXT NOT NULL UNIQUE,
+  confirmed INTEGER NOT NULL DEFAULT 0,
+  confirm_sent_at TEXT,
+  confirmed_at TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);

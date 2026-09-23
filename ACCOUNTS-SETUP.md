@@ -73,12 +73,14 @@ ever need to redeploy the Worker or database from scratch.
      `no-reply@gradedcards01.com`
 
 6. **Add secrets** under the Worker's Settings → Variables and secrets
-   (mark all as type **Secret** except `EMAIL_FROM`, which can be plain
-   text since it's not sensitive):
+   (mark all as type **Secret**):
    - `STRIPE_SECRET_KEY` — same value as the checkout Worker
    - `STRIPE_WEBHOOK_SECRET` — you'll get this in step 7
    - `RESEND_API_KEY` — from step 5
-   - `EMAIL_FROM` — your verified from-address, e.g. `no-reply@gradedcards01.com`
+   - `EMAIL_FROM` is **not** set here. It lives in `accounts-worker/wrangler.toml`
+     under `[vars]`, because every deploy from GitHub replaces plain
+     (non-secret) variables with that file's list, so one set only in the
+     dashboard is wiped on the next push
   - `ADMIN_KEY` — a long random string only you know (see "Private site-visit
     counter" below) — mark as **Secret**
 
@@ -251,6 +253,35 @@ this once in the D1 Console tab:
 
 ```sql
 ALTER TABLE orders ADD COLUMN seal_number TEXT;
+```
+
+## New-card alerts
+
+Visitors can sign up for "new cards added" emails from the home page,
+`notify.html`, and the Sealed / Raw Cards pages. It's double opt-in:
+signing up sends a confirmation email, and only addresses that click
+through get alerts, so nobody can sign someone else up. Every alert has
+an unsubscribe link, and unsubscribing deletes the address outright.
+
+**To send an alert:** open `https://www.gradedcards01.com/alerts.html`
+(same `ADMIN_KEY` unlock as the other private pages), write a subject and
+message, and send. A link to the shop and each subscriber's own
+unsubscribe link are added automatically. It shows how many confirmed
+subscribers it will go to and asks you to confirm before sending.
+
+**If your D1 database already existed before this feature was added**, run
+this once in the D1 Console tab:
+
+```sql
+CREATE TABLE IF NOT EXISTS subscribers (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT NOT NULL UNIQUE,
+  token TEXT NOT NULL UNIQUE,
+  confirmed INTEGER NOT NULL DEFAULT 0,
+  confirm_sent_at TEXT,
+  confirmed_at TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
 ```
 
 ## Reviewing return requests
