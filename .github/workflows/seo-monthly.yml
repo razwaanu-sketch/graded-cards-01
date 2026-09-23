@@ -1,0 +1,39 @@
+name: Monthly SEO check
+
+# On the 1st of each month: run the SEO audit and, if the Pokémon TCG set list
+# (seo/sets.json) hasn't been reviewed for 60 days, open a reminder issue to add
+# newly released sets. Nothing on the site is changed by this workflow.
+on:
+  schedule:
+    - cron: "0 9 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: SEO audit
+        run: |
+          python3 tools/seo_audit.py | tee audit.txt
+          cat seo/audit-report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Remind to add new sets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if grep -q "last reviewed" audit.txt && grep -q "Check for new Pokémon TCG releases" audit.txt; then
+            title="Review Pokémon TCG set list for new releases"
+            if [ -z "$(gh issue list --state open --search "$title in:title" --json number --jq '.[].number')" ]; then
+              gh issue create --title "$title" --body "The set list in \`seo/sets.json\` hasn't been reviewed for over 60 days. Add any newly released English or Japanese sets to their era, update \`last_reviewed\`, and push. The set guide, era pages and card pages update automatically. See \`seo/README.md\`."
+            fi
+          fi

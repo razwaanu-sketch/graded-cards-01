@@ -24,6 +24,7 @@ link is shared. They're generated from `product.html` and `products.js` by
 changes `products.js`, `product.html` or a card photo. Don't edit the `card-*.html` files by hand.
 To rebuild manually: `pip install Pillow`, then `python3 tools/build_card_pages.py`.
 The same script writes `sitemap.xml` and `google-merchant-feed.xml`. See `GOOGLE-SETUP.md`.
+It also builds the SEO category pages and the Pokémon TCG set guide from the files in `seo/`; see `seo/README.md` for how the SEO system works and how to add new sets.
 
 ## Getting fully live
 
