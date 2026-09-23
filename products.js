@@ -161,7 +161,7 @@ const PRODUCTS = [
     name: "Mega Gengar ex",
     set: "2026 Pokémon Ascended Heroes (English) — Mega Attack Rare",
     cardNumber: "269/217",
-    grade: "PSA 10",
+    grade: "ACE 10",
     gradeLabel: "GEM MINT",
     certNumber: "867276",
     price: 200,
