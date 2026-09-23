@@ -191,10 +191,6 @@
     price.className = "price";
     price.textContent = formatPrice(p.price, p.currency);
     footer.appendChild(price);
-    const oneOf = document.createElement("span");
-    oneOf.className = "oneof";
-    oneOf.textContent = "1 of 1";
-    footer.appendChild(oneOf);
 
     const cartActionContainer = document.createElement("div");
 
