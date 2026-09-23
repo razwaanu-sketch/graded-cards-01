@@ -85,7 +85,7 @@
     media.innerHTML = `<a class="product-media-link" href="${productUrl(product.id)}" aria-label="View ${product.name} details">
       <picture>
         <source srcset="${product.image.replace(/\.jpg$/, ".webp")}" type="image/webp">
-        <img src="${product.image}" alt="${product.name} — ${product.grade} graded Pokémon card, front view" loading="lazy">
+        <img src="${product.image}" alt="${product.name} ${product.grade} ${product.gradeLabel} graded Pokémon card, ${product.set} #${product.cardNumber}" loading="lazy">
       </picture>
     </a>`;
     const img = media.querySelector("img");

@@ -110,7 +110,7 @@
     const thumb = document.getElementById("pdp-sticky-thumb");
     if (thumb) {
       thumb.src = p.image;
-      thumb.alt = `${p.name} — ${p.grade} graded Pokémon card, front view`;
+      thumb.alt = imageAlt(p);
     }
     const name = document.getElementById("pdp-sticky-name");
     if (name) name.textContent = p.name;
@@ -122,6 +122,9 @@
     });
     observer.observe(mainCta);
   }
+
+  // Descriptive image text: card, grade, set and number (used for accessibility and image search).
+  const imageAlt = (p) => `${p.name} ${p.grade} ${p.gradeLabel} graded Pokémon card, ${p.set} #${p.cardNumber}`;
 
   function setMetaContent(selector, value) {
     const el = document.querySelector(selector);
@@ -161,7 +164,7 @@
     media.innerHTML = `<a class="product-media-link" href="${productUrl(p.id)}" aria-label="View ${p.name} details">
       <picture>
         <source srcset="${p.image.replace(/\.jpg$/, ".webp")}" type="image/webp">
-        <img src="${p.image}" alt="${p.name} — ${p.grade} graded Pokémon card, front view" loading="lazy">
+        <img src="${p.image}" alt="${imageAlt(p)}" loading="lazy">
       </picture>
     </a>`;
     const img = media.querySelector("img");
@@ -240,6 +243,14 @@
       return;
     }
 
+    // Card pages (card-<id>.html) ship with search-optimised titles, meta tags
+    // and breadcrumbs built by tools/build_card_pages.py; only the product.html
+    // fallback fills them in here.
+    if (!window.GC01_PRODUCT_ID) fillPageMeta();
+    renderProductBody();
+  }
+
+  function fillPageMeta() {
     document.title = `${product.name} — ${product.grade} ${product.gradeLabel} — Graded Cards 01`;
     const description = `${product.name}, ${product.set}, #${product.cardNumber} — ${product.grade} ${product.gradeLabel}, ${formatPrice(product.price, product.currency)}.`;
     const imageUrl = `https://www.gradedcards01.com/${product.image}`;
@@ -257,11 +268,14 @@
         "Other Singles";
       breadcrumb.innerHTML = `<a href="index.html#shop">Shop</a> / <span>${categoryLabel}</span> / <span>${product.name}</span>`;
     }
+  }
+
+  function renderProductBody() {
 
     const media = document.getElementById("pdp-media");
     media.innerHTML = `<picture>
       <source srcset="${product.image.replace(/\.jpg$/, ".webp")}" type="image/webp">
-      <img src="${product.image}" alt="${product.name} — ${product.grade} graded Pokémon card, front view" decoding="async">
+      <img src="${product.image}" alt="${imageAlt(product)}" decoding="async">
     </picture>`;
     const img = media.querySelector("img");
     img.addEventListener("error", () => {

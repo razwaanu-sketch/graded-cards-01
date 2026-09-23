@@ -1,0 +1,23 @@
+{
+  "_readme": "Keyword map for tools/seo_audit.py. Each page lists the search phrases it is meant to rank for; the audit checks every word of each phrase appears in that page's title, headings or meta description (so wording can stay natural). Card pages are checked automatically for '<card name> <grader> <grade>'. 'watchlist' is the list of popular Pokémon the audit tracks: a landing page such as charizard-graded-cards.html is created automatically once two graded cards of that Pokémon are in stock. Add phrases as you learn what customers search (Search Console > Performance).",
+  "pages": {
+    "index.html": ["graded Pokémon cards UK", "Pokémon cards for sale UK", "buy PSA graded Pokémon cards", "ACE graded Pokémon cards"],
+    "psa-graded-pokemon-cards.html": ["buy PSA graded Pokémon cards", "PSA graded Pokémon cards UK", "PSA graded Pokémon cards for sale"],
+    "psa-10-pokemon-cards.html": ["PSA 10 Pokémon cards", "PSA 10 Gem Mint Pokémon cards UK"],
+    "ace-graded-pokemon-cards.html": ["ACE graded Pokémon cards", "ACE graded Pokémon cards UK"],
+    "japanese-graded-pokemon-cards.html": ["Japanese graded Pokémon cards", "Japanese Pokémon cards UK"],
+    "english-graded-pokemon-cards.html": ["English graded Pokémon cards UK"],
+    "eeveelution-graded-cards.html": ["Eeveelution graded cards", "Eeveelution PSA 10"],
+    "charizard-graded-cards.html": ["Charizard PSA 10", "Charizard PSA 9", "Charizard graded cards UK"],
+    "gengar-graded-cards.html": ["Gengar graded cards", "Mega Gengar ex ACE 10"],
+    "scarlet-violet-graded-pokemon-cards.html": ["Scarlet & Violet graded Pokémon cards"],
+    "mega-evolution-graded-pokemon-cards.html": ["Mega Evolution graded Pokémon cards"],
+    "xy-graded-pokemon-cards.html": ["XY graded Pokémon cards"],
+    "pokemon-tcg-sets.html": ["Pokémon TCG sets in order"],
+    "shipping.html": ["tracked UK delivery", "14-day returns"],
+    "faq.html": ["graded Pokémon cards FAQ"],
+    "about.html": ["graded Pokémon cards", "PSA and ACE"]
+  },
+  "set_guide_terms": ["Base Set", "Diamond & Pearl", "Platinum", "HeartGold & SoulSilver", "Black & White", "XY", "Sun & Moon", "Sword & Shield", "Scarlet & Violet", "Mega Evolution", "Ascended Heroes", "Perfect Order", "Chaos Rising"],
+  "watchlist": ["Charizard", "Pikachu", "Umbreon", "Mewtwo", "Mew", "Gengar", "Rayquaza", "Lugia", "Eevee", "Sylveon", "Espeon", "Greninja", "Gyarados", "Blastoise", "Venusaur", "Dragonite", "Lucario", "Gardevoir", "Snorlax", "Giratina"]
+}

@@ -1,0 +1,121 @@
+{
+  "_readme": "Category landing pages built by tools/build_card_pages.py. A page is only published when at least 'min_in_stock' unsold cards match it, so there are never empty or thin pages; it appears or disappears automatically as stock changes. Placeholders: {count} cards in stock, {grade_range} e.g. 'PSA 8 to PSA 10', {grades} e.g. 'PSA 9 & PSA 10', {languages} e.g. 'Japanese and English', {sets} up to four set names in stock, {era} / {era_summary} (era pages), {pokemon} (Pokémon pages), {guide_link} a link to the set guide. Keep copy factual and readable: one clear keyword phrase per page, no repetition for its own sake.",
+  "min_in_stock": 2,
+  "fixed": [
+    {
+      "id": "psa",
+      "file": "psa-graded-pokemon-cards.html",
+      "match": {"grader": "PSA"},
+      "link_text": "PSA graded Pokémon cards",
+      "title": "PSA Graded Pokémon Cards for Sale UK | Graded Cards 01",
+      "h1": "PSA Graded Pokémon Cards for Sale",
+      "description": "Buy PSA graded Pokémon cards in the UK: {count} slabs from {grade_range}, {languages}. Every cert can be checked on PSA's website. Tracked, sealed delivery.",
+      "lede": "{count} PSA slabs in stock, {languages}, graded {grade_range}.",
+      "about_heading": "About PSA graded Pokémon cards",
+      "about": [
+        "PSA (Professional Sports Authenticator) is the most widely used grading company for Pokémon cards. Each card is graded on a 1 to 10 scale and sealed in a tamper-evident case with its own certification number.",
+        "You can look up any cert on PSA's website before you buy, and if a cert ever fails to verify we'll refund you in full. Every order ships from the UK, tracked and signed-for, under a numbered seal."
+      ]
+    },
+    {
+      "id": "psa-10",
+      "file": "psa-10-pokemon-cards.html",
+      "match": {"grader": "PSA", "grade": "10"},
+      "link_text": "PSA 10 Pokémon cards",
+      "title": "PSA 10 Pokémon Cards for Sale UK | Gem Mint | Graded Cards 01",
+      "h1": "PSA 10 Gem Mint Pokémon Cards",
+      "description": "Buy PSA 10 Gem Mint Pokémon cards in the UK: {count} slabs, {languages}, from {sets2}. Cert-verifiable, tracked and sealed.",
+      "lede": "{count} PSA 10 Gem Mint slabs in stock, {languages}.",
+      "about_heading": "What PSA 10 Gem Mint means",
+      "about": [
+        "PSA 10 Gem Mint is PSA's highest standard grade, given to a virtually perfect card. It's the grade most collectors aim for.",
+        "Every card here links to its PSA cert, so you can confirm the grade on PSA's own website before you buy."
+      ]
+    },
+    {
+      "id": "ace",
+      "file": "ace-graded-pokemon-cards.html",
+      "match": {"grader": "ACE"},
+      "link_text": "ACE graded Pokémon cards",
+      "title": "ACE Graded Pokémon Cards for Sale UK | Graded Cards 01",
+      "h1": "ACE Graded Pokémon Cards for Sale",
+      "description": "Buy ACE graded Pokémon cards in the UK: {count} slabs graded {grade_range}, {languages}. Check every cert on ACE Grading's website. Tracked, sealed delivery.",
+      "lede": "{count} ACE slabs in stock, graded {grade_range}.",
+      "about_heading": "About ACE graded Pokémon cards",
+      "about": [
+        "ACE Grading is a UK grading company. Its colourful, card-matched labels have made ACE slabs popular with collectors of modern Pokémon cards.",
+        "Each slab carries a certification number you can check on ACE's website before you buy, and our authenticity guarantee covers ACE cards just like PSA."
+      ]
+    },
+    {
+      "id": "japanese",
+      "file": "japanese-graded-pokemon-cards.html",
+      "match": {"language": "ja"},
+      "link_text": "Japanese graded Pokémon cards",
+      "title": "Japanese Graded Pokémon Cards for Sale UK | Graded Cards 01",
+      "h1": "Japanese Graded Pokémon Cards",
+      "description": "Buy graded Japanese Pokémon cards in the UK: {count} slabs graded {grade_range}, from {sets2}. Cert-verifiable and shipped tracked.",
+      "lede": "{count} graded Japanese cards in stock, graded {grade_range}.",
+      "about_heading": "About Japanese Pokémon cards",
+      "about": [
+        "Japanese sets usually release months before their English versions and often use different set names, numbering and rarities. Art Rare and Special Art Rare are the Japanese equivalents of Illustration Rare and Special Illustration Rare.",
+        "Every card here has been graded by PSA or ACE, with a cert you can check on the grader's website."
+      ]
+    },
+    {
+      "id": "english",
+      "file": "english-graded-pokemon-cards.html",
+      "match": {"language": "en"},
+      "link_text": "English graded Pokémon cards",
+      "title": "English Graded Pokémon Cards for Sale UK | Graded Cards 01",
+      "h1": "English Graded Pokémon Cards",
+      "description": "Buy graded English Pokémon cards in the UK: {count} slabs graded {grade_range}, from {sets2}. Cert-verifiable and shipped tracked.",
+      "lede": "{count} graded English cards in stock, graded {grade_range}.",
+      "about_heading": "About our English graded cards",
+      "about": [
+        "These are English-language prints, from classic sets to the newest Mega Evolution releases. Every card has been graded by PSA or ACE, with a cert you can check on the grader's website."
+      ]
+    },
+    {
+      "id": "eeveelutions",
+      "file": "eeveelution-graded-cards.html",
+      "match": {"tag": "eeveelution"},
+      "link_text": "Eeveelution graded cards",
+      "title": "Eeveelution {grades} Graded Cards UK | Graded Cards 01",
+      "h1": "Eeveelution Graded Cards",
+      "description": "Buy graded Eeveelution cards in the UK: Eevee and its evolutions, {count} slabs graded {grade_range}, from {sets2}. Tracked, sealed delivery.",
+      "lede": "{count} graded Eevee and Eeveelution cards in stock.",
+      "about_heading": "About Eeveelution cards",
+      "about": [
+        "Eevee and its evolutions are some of the most collected Pokémon in the hobby, and sets built around them have produced some of the most sought-after modern art cards.",
+        "Every card here is graded, with a cert you can check on the grader's website before you buy."
+      ]
+    }
+  ],
+  "era": {
+    "file": "{era_id}-graded-pokemon-cards.html",
+    "link_text": "{era} graded cards",
+    "title": "{era} Graded Pokémon Cards for Sale UK | Graded Cards 01",
+    "h1": "{era} Graded Pokémon Cards",
+    "description": "Buy graded Pokémon cards from the {era} era in the UK: {count} slabs graded {grade_range}, from {sets2}. Cert-verifiable, tracked delivery.",
+    "lede": "{count} graded {era} cards in stock, graded {grade_range}.",
+    "about_heading": "About the {era} era",
+    "about": [
+      "{era_summary}",
+      "Our {era} cards currently come from {sets}. See every {era} set, in release order, in our {guide_link}."
+    ]
+  },
+  "pokemon": {
+    "file": "{pokemon_id}-graded-cards.html",
+    "link_text": "{pokemon} graded cards",
+    "title": "{pokemon} {grades} Graded Cards UK | Graded Cards 01",
+    "h1": "{pokemon} Graded Cards",
+    "description": "Buy graded {pokemon} Pokémon cards in the UK: {count} slabs including {grades}, from {sets2}. Every cert can be checked online. Tracked, sealed delivery.",
+    "lede": "{count} graded {pokemon} cards in stock: {grades}.",
+    "about_heading": "About our {pokemon} cards",
+    "about": [
+      "Every {pokemon} card on this page is graded, and each slab's cert number can be checked on the grader's website before you buy.",
+      "Cards ship from the UK with tracked, signed-for delivery under a numbered tamper-evident seal, with 14-day returns."
+    ]
+  }
+}

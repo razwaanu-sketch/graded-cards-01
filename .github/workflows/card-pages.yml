@@ -1,18 +1,23 @@
 name: Card share pages
 
-# Rebuilds card-<id>.html, images/share/<id>.jpg, card-pages.js, sitemap.xml
-# and google-merchant-feed.xml whenever the card list, the product page
-# template or a card photo changes, so link previews, Google Search and
-# Google Shopping always match what's for sale.
+# Rebuilds every generated page (card pages, category landing pages, the set
+# guide, sitemap.xml, the Google Merchant feed, home/footer "shop by" links)
+# whenever the card list, a template, a card photo or the SEO data changes,
+# then runs the SEO audit and shows its summary on the run page.
 on:
   push:
     branches: [main]
     paths:
       - products.js
       - product.html
+      - about.html
+      - index.html
       - images/cards/**
       - images/logo-mark.png
-      - tools/build_card_pages.py
+      - seo/sets.json
+      - seo/categories.json
+      - seo/keywords.json
+      - tools/**
   workflow_dispatch:
 
 permissions:
@@ -36,21 +41,26 @@ jobs:
       - name: Install Pillow
         run: pip install --quiet Pillow
 
-      - name: Build card pages
-        run: python3 tools/build_card_pages.py
+      - name: Build pages
+        run: python3 tools/build_card_pages.py | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: SEO audit
+        run: |
+          python3 tools/seo_audit.py
+          cat seo/audit-report.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Commit changes
         id: commit
         run: |
-          git add -A card-*.html card-pages.js images/share sitemap.xml google-merchant-feed.xml
+          git add -A -- '*.html' card-pages.js images/share sitemap.xml google-merchant-feed.xml seo/audit-report.md
           if git diff --cached --quiet; then
-            echo "No card page changes."
+            echo "No generated changes."
             echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Rebuild card share pages"
+          git commit -m "Rebuild generated pages"
           git push
           echo "changed=true" >> "$GITHUB_OUTPUT"
 

@@ -1,0 +1,675 @@
+{
+  "_readme": "Pokémon TCG set registry used by tools/build_card_pages.py. Newest era first. When Pokémon releases a set, add it to its era's 'sets' (English) or 'japanese_sets' list. 'aliases' are extra spellings that may appear in a product's 'set' text in products.js (matched whole-word, longest first). A product whose set matches nothing is reported by the build and the SEO audit. Only add facts you have checked.",
+  "last_reviewed": "2026-09-24",
+  "eras": [
+    {
+      "id": "mega-evolution",
+      "name": "Mega Evolution",
+      "years": "2025–present",
+      "summary": "The Mega Evolution series began in 2025 and brought Mega Evolution Pokémon ex back to the card game.",
+      "sets": [
+        {
+          "name": "Mega Evolution",
+          "year": 2025
+        },
+        {
+          "name": "Phantasmal Flames",
+          "year": 2025
+        },
+        {
+          "name": "Ascended Heroes",
+          "year": 2026,
+          "kind": "special expansion"
+        },
+        {
+          "name": "Perfect Order",
+          "year": 2026
+        },
+        {
+          "name": "Chaos Rising",
+          "year": 2026
+        },
+        {
+          "name": "Pitch Black",
+          "year": 2026
+        }
+      ],
+      "japanese_sets": [
+        {
+          "code": "M1L",
+          "name": "Mega Brave",
+          "year": 2025
+        },
+        {
+          "code": "M2a",
+          "name": "MEGA Dream ex",
+          "year": 2025,
+          "aliases": [
+            "Mega Dream EX",
+            "Mega Dream"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scarlet-violet",
+      "name": "Scarlet & Violet",
+      "years": "2023–2025",
+      "summary": "Scarlet & Violet brought back Pokémon ex and introduced Illustration Rares and Special Illustration Rares, known as Art Rares and Special Art Rares in Japanese sets.",
+      "sets": [
+        {
+          "name": "Scarlet & Violet",
+          "year": 2023
+        },
+        {
+          "name": "Paldea Evolved",
+          "year": 2023
+        },
+        {
+          "name": "Obsidian Flames",
+          "year": 2023
+        },
+        {
+          "name": "151",
+          "year": 2023,
+          "aliases": [
+            "Scarlet & Violet 151",
+            "Pokémon 151"
+          ]
+        },
+        {
+          "name": "Paradox Rift",
+          "year": 2023
+        },
+        {
+          "name": "Paldean Fates",
+          "year": 2024
+        },
+        {
+          "name": "Temporal Forces",
+          "year": 2024
+        },
+        {
+          "name": "Twilight Masquerade",
+          "year": 2024
+        },
+        {
+          "name": "Shrouded Fable",
+          "year": 2024
+        },
+        {
+          "name": "Stellar Crown",
+          "year": 2024
+        },
+        {
+          "name": "Surging Sparks",
+          "year": 2024
+        },
+        {
+          "name": "Prismatic Evolutions",
+          "year": 2025
+        },
+        {
+          "name": "Journey Together",
+          "year": 2025
+        },
+        {
+          "name": "Destined Rivals",
+          "year": 2025
+        },
+        {
+          "name": "Black Bolt & White Flare",
+          "year": 2025,
+          "kind": "special expansion",
+          "aliases": [
+            "Black Bolt",
+            "White Flare"
+          ]
+        }
+      ],
+      "japanese_sets": [
+        {
+          "code": "SV8",
+          "name": "Super Electric Breaker",
+          "year": 2024
+        },
+        {
+          "code": "SV8a",
+          "name": "Terastal Festival ex",
+          "year": 2024,
+          "aliases": [
+            "Terastal Festival"
+          ]
+        },
+        {
+          "code": "SV9",
+          "name": "Battle Partners",
+          "year": 2025
+        }
+      ]
+    },
+    {
+      "id": "sword-shield",
+      "name": "Sword & Shield",
+      "years": "2020–2023",
+      "summary": "Sword & Shield introduced Pokémon V, VMAX and VSTAR, and its alternate-art cards are among the most collected of the modern era.",
+      "sets": [
+        {
+          "name": "Sword & Shield",
+          "year": 2020
+        },
+        {
+          "name": "Rebel Clash",
+          "year": 2020
+        },
+        {
+          "name": "Darkness Ablaze",
+          "year": 2020
+        },
+        {
+          "name": "Champion's Path",
+          "year": 2020
+        },
+        {
+          "name": "Vivid Voltage",
+          "year": 2020
+        },
+        {
+          "name": "Shining Fates",
+          "year": 2021
+        },
+        {
+          "name": "Battle Styles",
+          "year": 2021
+        },
+        {
+          "name": "Chilling Reign",
+          "year": 2021
+        },
+        {
+          "name": "Evolving Skies",
+          "year": 2021
+        },
+        {
+          "name": "Celebrations",
+          "year": 2021
+        },
+        {
+          "name": "Fusion Strike",
+          "year": 2021
+        },
+        {
+          "name": "Brilliant Stars",
+          "year": 2022
+        },
+        {
+          "name": "Astral Radiance",
+          "year": 2022
+        },
+        {
+          "name": "Pokémon GO",
+          "year": 2022
+        },
+        {
+          "name": "Lost Origin",
+          "year": 2022
+        },
+        {
+          "name": "Silver Tempest",
+          "year": 2022
+        },
+        {
+          "name": "Crown Zenith",
+          "year": 2023
+        }
+      ],
+      "japanese_sets": [
+        {
+          "code": "s12a",
+          "name": "VSTAR Universe",
+          "year": 2022
+        }
+      ]
+    },
+    {
+      "id": "sun-moon",
+      "name": "Sun & Moon",
+      "years": "2017–2019",
+      "summary": "Sun & Moon introduced Pokémon-GX and TAG TEAM cards, and Hidden Fates added the Shiny Vault.",
+      "sets": [
+        {
+          "name": "Sun & Moon",
+          "year": 2017
+        },
+        {
+          "name": "Guardians Rising",
+          "year": 2017
+        },
+        {
+          "name": "Burning Shadows",
+          "year": 2017
+        },
+        {
+          "name": "Shining Legends",
+          "year": 2017
+        },
+        {
+          "name": "Crimson Invasion",
+          "year": 2017
+        },
+        {
+          "name": "Ultra Prism",
+          "year": 2018
+        },
+        {
+          "name": "Forbidden Light",
+          "year": 2018
+        },
+        {
+          "name": "Celestial Storm",
+          "year": 2018
+        },
+        {
+          "name": "Dragon Majesty",
+          "year": 2018
+        },
+        {
+          "name": "Lost Thunder",
+          "year": 2018
+        },
+        {
+          "name": "Team Up",
+          "year": 2019
+        },
+        {
+          "name": "Detective Pikachu",
+          "year": 2019
+        },
+        {
+          "name": "Unbroken Bonds",
+          "year": 2019
+        },
+        {
+          "name": "Unified Minds",
+          "year": 2019
+        },
+        {
+          "name": "Hidden Fates",
+          "year": 2019
+        },
+        {
+          "name": "Cosmic Eclipse",
+          "year": 2019
+        }
+      ],
+      "japanese_sets": []
+    },
+    {
+      "id": "xy",
+      "name": "XY",
+      "years": "2014–2016",
+      "summary": "XY is where Mega Evolution first arrived in the card game, alongside Pokémon-EX and BREAK cards. It closed with Evolutions, a reimagining of the original Base Set.",
+      "sets": [
+        {
+          "name": "XY",
+          "year": 2014
+        },
+        {
+          "name": "Flashfire",
+          "year": 2014
+        },
+        {
+          "name": "Furious Fists",
+          "year": 2014
+        },
+        {
+          "name": "Phantom Forces",
+          "year": 2014
+        },
+        {
+          "name": "Primal Clash",
+          "year": 2015
+        },
+        {
+          "name": "Double Crisis",
+          "year": 2015
+        },
+        {
+          "name": "Roaring Skies",
+          "year": 2015
+        },
+        {
+          "name": "Ancient Origins",
+          "year": 2015
+        },
+        {
+          "name": "BREAKthrough",
+          "year": 2015
+        },
+        {
+          "name": "BREAKpoint",
+          "year": 2016
+        },
+        {
+          "name": "Generations",
+          "year": 2016
+        },
+        {
+          "name": "Fates Collide",
+          "year": 2016
+        },
+        {
+          "name": "Steam Siege",
+          "year": 2016
+        },
+        {
+          "name": "Evolutions",
+          "year": 2016,
+          "aliases": [
+            "XY Evolutions"
+          ]
+        }
+      ],
+      "japanese_sets": [
+        {
+          "code": "CP6",
+          "name": "20th Anniversary",
+          "year": 2016
+        }
+      ]
+    },
+    {
+      "id": "black-white",
+      "name": "Black & White",
+      "years": "2011–2013",
+      "summary": "Black & White introduced Pokémon-EX and full-art cards, and closed with the Team Plasma sets and Legendary Treasures.",
+      "sets": [
+        {
+          "name": "Black & White",
+          "year": 2011
+        },
+        {
+          "name": "Emerging Powers",
+          "year": 2011
+        },
+        {
+          "name": "Noble Victories",
+          "year": 2011
+        },
+        {
+          "name": "Next Destinies",
+          "year": 2012
+        },
+        {
+          "name": "Dark Explorers",
+          "year": 2012
+        },
+        {
+          "name": "Dragons Exalted",
+          "year": 2012
+        },
+        {
+          "name": "Dragon Vault",
+          "year": 2012,
+          "kind": "special expansion"
+        },
+        {
+          "name": "Boundaries Crossed",
+          "year": 2012
+        },
+        {
+          "name": "Plasma Storm",
+          "year": 2013
+        },
+        {
+          "name": "Plasma Freeze",
+          "year": 2013
+        },
+        {
+          "name": "Plasma Blast",
+          "year": 2013
+        },
+        {
+          "name": "Legendary Treasures",
+          "year": 2013
+        }
+      ],
+      "japanese_sets": []
+    },
+    {
+      "id": "heartgold-soulsilver",
+      "name": "HeartGold & SoulSilver",
+      "years": "2010–2011",
+      "summary": "HeartGold & SoulSilver brought Pokémon Prime and Pokémon LEGEND cards, and ended with Call of Legends.",
+      "sets": [
+        {
+          "name": "HeartGold & SoulSilver",
+          "year": 2010
+        },
+        {
+          "name": "Unleashed",
+          "year": 2010
+        },
+        {
+          "name": "Undaunted",
+          "year": 2010
+        },
+        {
+          "name": "Triumphant",
+          "year": 2010
+        },
+        {
+          "name": "Call of Legends",
+          "year": 2011
+        }
+      ],
+      "japanese_sets": []
+    },
+    {
+      "id": "platinum",
+      "name": "Platinum",
+      "years": "2009",
+      "summary": "Platinum continued Pokémon LV.X and added Pokémon SP cards.",
+      "sets": [
+        {
+          "name": "Platinum",
+          "year": 2009
+        },
+        {
+          "name": "Rising Rivals",
+          "year": 2009
+        },
+        {
+          "name": "Supreme Victors",
+          "year": 2009
+        },
+        {
+          "name": "Arceus",
+          "year": 2009
+        }
+      ],
+      "japanese_sets": []
+    },
+    {
+      "id": "diamond-pearl",
+      "name": "Diamond & Pearl",
+      "years": "2007–2008",
+      "summary": "Diamond & Pearl introduced Pokémon LV.X cards.",
+      "sets": [
+        {
+          "name": "Diamond & Pearl",
+          "year": 2007
+        },
+        {
+          "name": "Mysterious Treasures",
+          "year": 2007
+        },
+        {
+          "name": "Secret Wonders",
+          "year": 2007
+        },
+        {
+          "name": "Great Encounters",
+          "year": 2008
+        },
+        {
+          "name": "Majestic Dawn",
+          "year": 2008
+        },
+        {
+          "name": "Legends Awakened",
+          "year": 2008
+        },
+        {
+          "name": "Stormfront",
+          "year": 2008
+        }
+      ],
+      "japanese_sets": []
+    },
+    {
+      "id": "ex",
+      "name": "EX",
+      "years": "2003–2007",
+      "summary": "The EX era introduced Pokémon-ex, Gold Star cards and Delta Species.",
+      "sets": [
+        {
+          "name": "Ruby & Sapphire",
+          "year": 2003
+        },
+        {
+          "name": "Sandstorm",
+          "year": 2003
+        },
+        {
+          "name": "Dragon",
+          "year": 2003
+        },
+        {
+          "name": "Team Magma vs Team Aqua",
+          "year": 2004
+        },
+        {
+          "name": "Hidden Legends",
+          "year": 2004
+        },
+        {
+          "name": "FireRed & LeafGreen",
+          "year": 2004
+        },
+        {
+          "name": "Team Rocket Returns",
+          "year": 2004
+        },
+        {
+          "name": "Deoxys",
+          "year": 2005
+        },
+        {
+          "name": "Emerald",
+          "year": 2005
+        },
+        {
+          "name": "Unseen Forces",
+          "year": 2005
+        },
+        {
+          "name": "Delta Species",
+          "year": 2005
+        },
+        {
+          "name": "Legend Maker",
+          "year": 2006
+        },
+        {
+          "name": "Holon Phantoms",
+          "year": 2006
+        },
+        {
+          "name": "Crystal Guardians",
+          "year": 2006
+        },
+        {
+          "name": "Dragon Frontiers",
+          "year": 2006
+        },
+        {
+          "name": "Power Keepers",
+          "year": 2007
+        }
+      ],
+      "japanese_sets": [],
+      "short": "EX Era"
+    },
+    {
+      "id": "wotc",
+      "name": "Base Set and the Wizards of the Coast era",
+      "years": "1999–2003",
+      "summary": "The original era published by Wizards of the Coast, from Base Set through the Neo and e-Card sets. 1st Edition and Shadowless Base Set cards are some of the most valuable in the hobby.",
+      "sets": [
+        {
+          "name": "Base Set",
+          "year": 1999
+        },
+        {
+          "name": "Jungle",
+          "year": 1999
+        },
+        {
+          "name": "Fossil",
+          "year": 1999
+        },
+        {
+          "name": "Base Set 2",
+          "year": 2000
+        },
+        {
+          "name": "Team Rocket",
+          "year": 2000
+        },
+        {
+          "name": "Gym Heroes",
+          "year": 2000
+        },
+        {
+          "name": "Gym Challenge",
+          "year": 2000
+        },
+        {
+          "name": "Neo Genesis",
+          "year": 2000
+        },
+        {
+          "name": "Neo Discovery",
+          "year": 2001
+        },
+        {
+          "name": "Neo Revelation",
+          "year": 2001
+        },
+        {
+          "name": "Neo Destiny",
+          "year": 2002
+        },
+        {
+          "name": "Legendary Collection",
+          "year": 2002
+        },
+        {
+          "name": "Expedition",
+          "year": 2002
+        },
+        {
+          "name": "Aquapolis",
+          "year": 2003
+        },
+        {
+          "name": "Skyridge",
+          "year": 2003
+        }
+      ],
+      "japanese_sets": [],
+      "short": "Base Set & WOTC Era"
+    }
+  ]
+}
