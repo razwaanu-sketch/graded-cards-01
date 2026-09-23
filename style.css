@@ -351,7 +351,7 @@ body.drawer-open{overflow:hidden}
 .shop-empty{color:var(--ink-dim);text-align:center;padding:32px 0;grid-column:1/-1}
 
 /* Content pages (about, contact, shipping, terms, privacy) */
-.page-hero{padding:calc(var(--topbar-h) + 96px) 18px 24px;text-align:center}
+.page-hero{padding:40px 18px 24px;text-align:center}
 .page-hero h1{color:var(--gold);font-family:var(--font);font-weight:800;letter-spacing:-0.02em;margin:0 0 .5rem}
 .page-hero p{color:var(--ink-dim);margin:0}
 .prose{padding:24px 18px 64px;max-width:760px;margin:0 auto}
