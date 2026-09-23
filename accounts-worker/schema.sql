@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS orders (
   carrier TEXT,
   shipped_at TEXT,
   dispatch_photo_taken INTEGER NOT NULL DEFAULT 0,
+  seal_number TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
