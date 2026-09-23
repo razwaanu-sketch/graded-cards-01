@@ -15,6 +15,15 @@ Pages at [www.gradedcards01.com](https://www.gradedcards01.com).
 - `style.css`, `script.js` — shared styling and interactions
 - `images/cards/` — card photos (filenames referenced from `products.js`)
 
+## Card share pages
+
+Every card has its own page, `card-<id>.html`, and a 1200×630 preview image in `images/share/`.
+These give WhatsApp, Instagram, Facebook and Google the right title, photo and price when a card
+link is shared. They're generated from `product.html` and `products.js` by
+`tools/build_card_pages.py`, and the "Card share pages" GitHub Action reruns it on every push that
+changes `products.js`, `product.html` or a card photo. Don't edit the `card-*.html` files by hand.
+To rebuild manually: `pip install Pillow`, then `python3 tools/build_card_pages.py`.
+
 ## Getting fully live
 
 See **[SETUP.md](SETUP.md)** for the remaining steps: uploading real card

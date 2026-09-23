@@ -3,8 +3,17 @@
 // nothing to keep in sync between the two.
 (function () {
   const params = new URLSearchParams(location.search);
-  const id = params.get("id");
+  // card-<id>.html pages set GC01_PRODUCT_ID; product.html?id=<id> still works.
+  const id = window.GC01_PRODUCT_ID || params.get("id");
   const product = typeof PRODUCTS !== "undefined" ? PRODUCTS.find((p) => p.id === id) : null;
+  const productUrl = (pid) => (window.gc01ProductUrl ? window.gc01ProductUrl(pid) : `product.html?id=${pid}`);
+
+  // Old product.html?id= links move to the card's own page, so the address
+  // people copy and share is the one with a proper link preview.
+  if (!window.GC01_PRODUCT_ID && product && productUrl(product.id).startsWith("card-")) {
+    location.replace(productUrl(product.id) + location.hash);
+    return;
+  }
 
   const loaded = document.getElementById("pdp-loaded");
   const notFound = document.getElementById("pdp-notfound");
@@ -149,7 +158,7 @@
 
     const media = document.createElement("div");
     media.className = "product-media";
-    media.innerHTML = `<a class="product-media-link" href="product.html?id=${p.id}" aria-label="View ${p.name} details">
+    media.innerHTML = `<a class="product-media-link" href="${productUrl(p.id)}" aria-label="View ${p.name} details">
       <picture>
         <source srcset="${p.image.replace(/\.jpg$/, ".webp")}" type="image/webp">
         <img src="${p.image}" alt="${p.name} — ${p.grade} graded Pokémon card, front view" loading="lazy">
@@ -172,7 +181,7 @@
     title.className = "product-title";
     const titleLink = document.createElement("a");
     titleLink.className = "product-title-link";
-    titleLink.href = `product.html?id=${p.id}`;
+    titleLink.href = productUrl(p.id);
     titleLink.textContent = p.name;
     title.appendChild(titleLink);
 
@@ -206,7 +215,7 @@
 
     card.addEventListener("click", (e) => {
       if (e.target.closest("a, .cart-toggle")) return;
-      window.location.href = `product.html?id=${p.id}`;
+      window.location.href = productUrl(p.id);
     });
 
     return card;
@@ -238,7 +247,7 @@
     setMetaContent('meta[property="og:title"]', `${product.name} — Graded Cards 01`);
     setMetaContent('meta[property="og:description"]', description);
     setMetaContent('meta[property="og:image"]', imageUrl);
-    setMetaContent('meta[property="og:url"]', `https://www.gradedcards01.com/product.html?id=${product.id}`);
+    setMetaContent('meta[property="og:url"]', `https://www.gradedcards01.com/${productUrl(product.id)}`);
     setMetaContent('meta[name="twitter:image"]', imageUrl);
 
     if (breadcrumb) {

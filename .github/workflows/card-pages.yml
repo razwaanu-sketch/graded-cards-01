@@ -1,0 +1,62 @@
+name: Card share pages
+
+# Rebuilds card-<id>.html, images/share/<id>.jpg and card-pages.js whenever
+# the card list, the product page template or a card photo changes, so every
+# card keeps a correct WhatsApp/Instagram/Google link preview.
+on:
+  push:
+    branches: [main]
+    paths:
+      - products.js
+      - product.html
+      - images/cards/**
+      - images/logo-mark.png
+      - tools/build_card_pages.py
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: card-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Pillow
+        run: pip install --quiet Pillow
+
+      - name: Build card pages
+        run: python3 tools/build_card_pages.py
+
+      - name: Commit changes
+        id: commit
+        run: |
+          git add -A card-*.html card-pages.js images/share
+          if git diff --cached --quiet; then
+            echo "No card page changes."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Rebuild card share pages"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      # Pushes made by this workflow don't start a Pages build on their own.
+      - name: Publish the site
+        if: steps.commit.outputs.changed == 'true'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds"
