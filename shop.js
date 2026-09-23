@@ -13,6 +13,9 @@
     }
   };
 
+  // Each card links to its own shareable page when one has been generated.
+  const productUrl = (id) => (window.gc01ProductUrl ? window.gc01ProductUrl(id) : `product.html?id=${id}`);
+
   let activeTag = "";
   let activeQuery = "";
   let activeSort = "price-desc";
@@ -79,7 +82,7 @@
     // browser's <picture> source-selection sees the <source> before the <img>
     // starts loading — appending an already-src'd <img> into <picture> after
     // the fact causes some browsers to fetch both the source and the img src.
-    media.innerHTML = `<a class="product-media-link" href="product.html?id=${product.id}" aria-label="View ${product.name} details">
+    media.innerHTML = `<a class="product-media-link" href="${productUrl(product.id)}" aria-label="View ${product.name} details">
       <picture>
         <source srcset="${product.image.replace(/\.jpg$/, ".webp")}" type="image/webp">
         <img src="${product.image}" alt="${product.name} — ${product.grade} graded Pokémon card, front view" loading="lazy">
@@ -109,7 +112,7 @@
     title.className = "product-title";
     const titleLink = document.createElement("a");
     titleLink.className = "product-title-link";
-    titleLink.href = `product.html?id=${product.id}`;
+    titleLink.href = productUrl(product.id);
     titleLink.textContent = product.name;
     title.appendChild(titleLink);
 
@@ -146,7 +149,7 @@
     // those links to handle their own clicks natively.
     card.addEventListener("click", (e) => {
       if (e.target.closest("a, .cart-toggle")) return;
-      window.location.href = `product.html?id=${product.id}`;
+      window.location.href = productUrl(product.id);
     });
 
     return card;
