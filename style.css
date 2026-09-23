@@ -260,7 +260,7 @@ body.drawer-open{overflow:hidden}
 .cart-toggle.in-cart{background:transparent;color:var(--gold);border:1px solid var(--gold)}
 
 /* Product detail page (product.html) */
-.pdp-breadcrumb{padding:calc(var(--topbar-h) + 90px) 0 0;margin:0 0 18px;font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;color:var(--ink-faint);text-transform:uppercase}
+.pdp-breadcrumb{padding:28px 0 0;margin:0 0 18px;font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;color:var(--ink-faint);text-transform:uppercase}
 .pdp-breadcrumb a{color:var(--ink-faint)}
 .pdp-breadcrumb a:hover{color:var(--gold)}
 .pdp{display:flex;flex-direction:column;gap:28px;padding-bottom:48px}
@@ -293,7 +293,7 @@ body.drawer-open{overflow:hidden}
 .payment-badges-section{text-align:center}
 .payment-badges-title{font-size:1.1rem;margin-bottom:1rem}
 .payment-badges-center{justify-content:center}
-.pdp-notfound{padding:calc(var(--topbar-h) + 120px) 0 80px;text-align:center}
+.pdp-notfound{padding:64px 0 80px;text-align:center}
 .pdp-notfound h1{color:var(--gold);margin:0 0 .6rem}
 .pdp-notfound p{color:var(--ink-dim)}
 @media(min-width:780px){
