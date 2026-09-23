@@ -1,8 +1,9 @@
 name: Card share pages
 
-# Rebuilds card-<id>.html, images/share/<id>.jpg and card-pages.js whenever
-# the card list, the product page template or a card photo changes, so every
-# card keeps a correct WhatsApp/Instagram/Google link preview.
+# Rebuilds card-<id>.html, images/share/<id>.jpg, card-pages.js, sitemap.xml
+# and google-merchant-feed.xml whenever the card list, the product page
+# template or a card photo changes, so link previews, Google Search and
+# Google Shopping always match what's for sale.
 on:
   push:
     branches: [main]
@@ -41,7 +42,7 @@ jobs:
       - name: Commit changes
         id: commit
         run: |
-          git add -A card-*.html card-pages.js images/share
+          git add -A card-*.html card-pages.js images/share sitemap.xml google-merchant-feed.xml
           if git diff --cached --quiet; then
             echo "No card page changes."
             echo "changed=false" >> "$GITHUB_OUTPUT"
