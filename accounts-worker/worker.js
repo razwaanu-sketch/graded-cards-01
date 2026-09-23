@@ -236,10 +236,10 @@ async function sendShippingEmail(env, email, productNames, trackingNumber, carri
   // The seal number is the point of the seal: a tampered parcel can be
   // resealed, but not with a seal carrying the number sent here.
   const sealText = sealNumber
-    ? `\n\nYour parcel is closed with tamper-evident seal #${sealNumber}. Before accepting delivery, check the seal is intact and its number matches. If it's broken or doesn't match, refuse the parcel if you can (or photograph it before opening) and contact us within 48 hours.`
+    ? `\n\nYour parcel is closed with tamper-evident seal #${sealNumber}. Before accepting delivery, check the seal is intact and its number matches. If it's broken or doesn't match, refuse the parcel if you can (or photograph it before opening) and contact us straight away.`
     : "";
   const sealHtml = sealNumber
-    ? `<p><strong>Tamper-evident seal:</strong> #${escapeHtml(sealNumber)}<br>Before accepting delivery, check the seal is intact and its number matches. If it's broken or doesn't match, refuse the parcel if you can (or photograph it before opening) and contact us within 48 hours.</p>`
+    ? `<p><strong>Tamper-evident seal:</strong> #${escapeHtml(sealNumber)}<br>Before accepting delivery, check the seal is intact and its number matches. If it's broken or doesn't match, refuse the parcel if you can (or photograph it before opening) and contact us straight away.</p>`
     : "";
   await sendEmail(env, {
     to: email,
