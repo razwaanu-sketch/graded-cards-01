@@ -73,7 +73,7 @@
 
   // Hero staggered fade-in
   window.addEventListener('load', ()=>{
-    document.querySelectorAll('.hero-title, .hero-sub, .hero-search-wrap').forEach((el,i)=>{
+    document.querySelectorAll('.hero-title, .hero-sub, .hero-showcase').forEach((el,i)=>{
       el.style.opacity = 0; el.style.transform = 'translateY(8px)';
       setTimeout(()=>{ el.style.transition = 'opacity .8s cubic-bezier(.2,.9,.2,1), transform .8s cubic-bezier(.2,.9,.2,1)'; el.style.opacity = 1; el.style.transform = 'none'; }, 200 + i*140);
     });
