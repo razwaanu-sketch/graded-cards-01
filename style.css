@@ -404,20 +404,20 @@ body.drawer-open{overflow:hidden}
 
 /* Order dashboard */
 .orders-list{display:flex;flex-direction:column;gap:12px;margin-top:1rem}
-.order-row{background:var(--bg-card);border:1px solid var(--line-soft);padding:16px}
-.order-row-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:.72rem;color:var(--ink-dim)}
-.order-row-product{color:var(--ink);font-weight:700;margin:.5rem 0 0}
-.order-row-status{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;padding:.2rem .5rem;white-space:nowrap;height:fit-content}
-.order-row-status.status-paid{color:var(--gold);border:1px solid var(--gold)}
-.order-row-status.status-shipped{color:#7fd88f;border:1px solid #7fd88f}
-.order-row-status.status-refunded{color:var(--ink-faint);border:1px solid var(--line)}
+.admin-order-row{background:var(--bg-card);border:1px solid var(--line-soft);padding:16px}
+.admin-order-row-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:.72rem;color:var(--ink-dim)}
+.admin-order-row-product{color:var(--ink);font-weight:700;margin:.5rem 0 0}
+.admin-order-row-status{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;padding:.2rem .5rem;white-space:nowrap;height:fit-content}
+.admin-order-row-status.status-paid{color:var(--gold);border:1px solid var(--gold)}
+.admin-order-row-status.status-shipped{color:#7fd88f;border:1px solid #7fd88f}
+.admin-order-row-status.status-refunded{color:var(--ink-faint);border:1px solid var(--line)}
 .ship-form{display:flex;gap:8px;flex-wrap:wrap;margin-top:.7rem;align-items:center}
 .ship-form input[type="text"]{background:var(--bg-deep);border:1px solid var(--line);color:var(--ink);padding:.5rem .7rem;font:inherit;flex:1 1 140px}
 .ship-form input[type="text"]:focus{outline:2px solid rgba(52,84,214,0.45)}
 .ship-form-photo-check{display:flex;align-items:center;gap:6px;color:var(--ink-dim);font-size:.78rem;flex:0 0 auto;white-space:nowrap;cursor:pointer}
 .ship-form-photo-check input{width:auto}
 .order-tracking-info{font-family:var(--mono);font-size:.72rem;color:var(--ink-dim);margin:.5rem 0 0}
-.order-photo-missing{color:#e7b8b8}
+.order-check-missing{color:#e7b8b8}
 
 /* Contact form */
 .contact-form{display:flex;flex-direction:column;gap:14px;max-width:520px;margin:1.5rem auto 0}

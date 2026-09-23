@@ -239,6 +239,20 @@ this once in the D1 Console tab:
 ALTER TABLE orders ADD COLUMN dispatch_photo_taken INTEGER NOT NULL DEFAULT 0;
 ```
 
+The ship form also takes a **seal number** — the number on the
+tamper-evident seal you close each parcel with. It's included in the
+shipping email, and the Shipping & Returns page and FAQ tell buyers to
+check the seal is intact and its number matches before accepting delivery.
+Shipped orders show "🔒 Seal #…" in the dashboard, or a "⚠ No seal number
+recorded" warning if it was left blank.
+
+**If your D1 database already existed before this feature was added**, run
+this once in the D1 Console tab:
+
+```sql
+ALTER TABLE orders ADD COLUMN seal_number TEXT;
+```
+
 ## Reviewing return requests
 
 There's no admin page for this yet — a buyer's return request just creates

@@ -56,20 +56,20 @@
 
     orders.forEach((order) => {
       const row = document.createElement("div");
-      row.className = "order-row";
+      row.className = "admin-order-row";
 
       const top = document.createElement("div");
-      top.className = "order-row-top";
+      top.className = "admin-order-row-top";
       const left = document.createElement("span");
       left.textContent = `#${order.id} · ${order.customer_email} · ${order.created_at}`;
       const status = document.createElement("span");
-      status.className = `order-row-status ${statusClass(order)}`;
+      status.className = `admin-order-row-status ${statusClass(order)}`;
       status.textContent = statusLabel(order);
       top.appendChild(left);
       top.appendChild(status);
 
       const product = document.createElement("div");
-      product.className = "order-row-product";
+      product.className = "admin-order-row-product";
       product.textContent = `${order.product_name} — ${formatMoney(order.amount, order.currency)}`;
 
       row.appendChild(top);
@@ -83,8 +83,13 @@
           : `Shipped ${order.shipped_at} — tracking ${order.tracking_number}`;
         row.appendChild(info);
 
+        const sealInfo = document.createElement("p");
+        sealInfo.className = order.seal_number ? "order-tracking-info" : "order-tracking-info order-check-missing";
+        sealInfo.textContent = order.seal_number ? `🔒 Seal #${order.seal_number}` : "⚠ No seal number recorded";
+        row.appendChild(sealInfo);
+
         const photoInfo = document.createElement("p");
-        photoInfo.className = order.dispatch_photo_taken ? "order-tracking-info" : "order-tracking-info order-photo-missing";
+        photoInfo.className = order.dispatch_photo_taken ? "order-tracking-info" : "order-tracking-info order-check-missing";
         photoInfo.textContent = order.dispatch_photo_taken ? "📷 Dispatch photo recorded" : "⚠ No dispatch photo recorded";
         row.appendChild(photoInfo);
       } else if (order.status !== "refunded" && order.status !== "partially_refunded") {
@@ -99,6 +104,10 @@
         trackingInput.type = "text";
         trackingInput.placeholder = "Tracking number";
         trackingInput.required = true;
+
+        const sealInput = document.createElement("input");
+        sealInput.type = "text";
+        sealInput.placeholder = "Seal number";
 
         const photoLabel = document.createElement("label");
         photoLabel.className = "ship-form-photo-check";
@@ -118,6 +127,7 @@
 
         form.appendChild(carrierInput);
         form.appendChild(trackingInput);
+        form.appendChild(sealInput);
         form.appendChild(photoLabel);
         form.appendChild(submitBtn);
         form.appendChild(note);
@@ -139,6 +149,7 @@
                 tracking_number: trackingNumber,
                 carrier: carrierInput.value.trim(),
                 dispatch_photo_taken: photoCheckbox.checked,
+                seal_number: sealInput.value.trim(),
               }),
             });
             if (!res.ok) throw new Error("request failed");

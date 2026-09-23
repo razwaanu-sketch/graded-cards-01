@@ -224,18 +224,30 @@ async function sendOrderConfirmationEmail(env, email, items) {
   });
 }
 
-async function sendShippingEmail(env, email, productNames, trackingNumber, carrier) {
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+}
+
+async function sendShippingEmail(env, email, productNames, trackingNumber, carrier, sealNumber) {
   const itemsLine = productNames.join(", ");
   const trackingLine = carrier
     ? `Carrier: ${carrier}\nTracking number: ${trackingNumber}`
     : `Tracking number: ${trackingNumber}`;
+  // The seal number is the point of the seal: a tampered parcel can be
+  // resealed, but not with a seal carrying the number sent here.
+  const sealText = sealNumber
+    ? `\n\nYour parcel is closed with tamper-evident seal #${sealNumber}. Before accepting delivery, check the seal is intact and its number matches. If it's broken or doesn't match, refuse the parcel if you can (or photograph it before opening) and contact us within 48 hours.`
+    : "";
+  const sealHtml = sealNumber
+    ? `<p><strong>Tamper-evident seal:</strong> #${escapeHtml(sealNumber)}<br>Before accepting delivery, check the seal is intact and its number matches. If it's broken or doesn't match, refuse the parcel if you can (or photograph it before opening) and contact us within 48 hours.</p>`
+    : "";
   await sendEmail(env, {
     to: email,
     subject: "Your order has shipped — Graded Cards 01",
-    text: `Good news — your order is on its way.\n\nItem(s): ${itemsLine}\n\n${trackingLine}\n\n— Graded Cards 01`,
-    html: `<p>Good news — your order is on its way.</p><p><strong>Item(s):</strong> ${itemsLine}</p><p>${
-      carrier ? `<strong>Carrier:</strong> ${carrier}<br>` : ""
-    }<strong>Tracking number:</strong> ${trackingNumber}</p><p>— Graded Cards 01</p>`,
+    text: `Good news — your order is on its way.\n\nItem(s): ${itemsLine}\n\n${trackingLine}${sealText}\n\n— Graded Cards 01`,
+    html: `<p>Good news — your order is on its way.</p><p><strong>Item(s):</strong> ${escapeHtml(itemsLine)}</p><p>${
+      carrier ? `<strong>Carrier:</strong> ${escapeHtml(carrier)}<br>` : ""
+    }<strong>Tracking number:</strong> ${escapeHtml(trackingNumber)}</p>${sealHtml}<p>— Graded Cards 01</p>`,
   });
 }
 
@@ -535,7 +547,7 @@ async function handleAdminOrders(request, env) {
 
   const { results } = await env.DB.prepare(
     `SELECT id, customer_email, product_name, amount, currency, status,
-            tracking_number, carrier, shipped_at, dispatch_photo_taken, created_at
+            tracking_number, carrier, shipped_at, dispatch_photo_taken, seal_number, created_at
      FROM orders ORDER BY id DESC LIMIT 100`
   ).all();
 
@@ -553,6 +565,7 @@ async function handleAdminShipOrder(request, env) {
   const trackingNumber = (body.tracking_number || "").trim();
   const carrier = (body.carrier || "").trim();
   const dispatchPhotoTaken = body.dispatch_photo_taken ? 1 : 0;
+  const sealNumber = (body.seal_number || "").trim().slice(0, 64);
   if (!orderId || !trackingNumber) {
     return jsonResponse({ error: "order_id and tracking_number are required." }, 400);
   }
@@ -565,13 +578,13 @@ async function handleAdminShipOrder(request, env) {
   if (!order) return jsonResponse({ error: "Order not found." }, 404);
 
   await env.DB.prepare(
-    "UPDATE orders SET tracking_number = ?, carrier = ?, shipped_at = datetime('now'), dispatch_photo_taken = ? WHERE id = ?"
+    "UPDATE orders SET tracking_number = ?, carrier = ?, shipped_at = datetime('now'), dispatch_photo_taken = ?, seal_number = ? WHERE id = ?"
   )
-    .bind(trackingNumber, carrier || null, dispatchPhotoTaken, orderId)
+    .bind(trackingNumber, carrier || null, dispatchPhotoTaken, sealNumber || null, orderId)
     .run();
 
   try {
-    await sendShippingEmail(env, order.customer_email, [order.product_name], trackingNumber, carrier);
+    await sendShippingEmail(env, order.customer_email, [order.product_name], trackingNumber, carrier, sealNumber);
   } catch (e) {
     // The tracking info is already saved — a Resend hiccup here shouldn't
     // undo that; the owner can see the email didn't send and retry. The
