@@ -11,6 +11,7 @@
   --gold:#3454d6;
   --gold-2:#5b78e8;
   --gold-ink:#ffffff;
+  --link:#7089ee; /* readable blue for text links on every dark background */
   --font:"Archivo", Helvetica, Arial, sans-serif;
   --mono:"JetBrains Mono", ui-monospace, monospace;
 
@@ -368,7 +369,8 @@ body.drawer-open{overflow:hidden}
 .faq-item[open] summary::after{transform:rotate(45deg)}
 .faq-item summary:hover{color:var(--gold)}
 .faq-item p{margin:0;padding:0 18px 16px}
-.prose a{color:var(--gold)}
+.prose a{color:var(--link)}
+.prose a:hover, .prose a:focus{color:var(--ink)}
 .prose .btn-gold{color:var(--gold-ink)}
 .prose .btn-outline, .prose .btn-ghost{color:var(--ink)}
 .coming-soon-badge{display:inline-block;background:var(--bg-card);border:1px solid var(--gold);color:var(--gold);font-family:var(--mono);font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:.5rem 1.1rem;margin:.5rem 0 1.4rem}
@@ -505,6 +507,8 @@ body.drawer-open{overflow:hidden}
 .trust-list{counter-reset: trust-item}
 .trust-list h3{margin:0;font-size:.95rem;font-weight:700}
 .trust-list p{margin:0;font-size:.82rem}
+.trust-list a{color:var(--link);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.trust-list a:hover, .trust-list a:focus{color:var(--ink)}
 
 /* Footer */
 .site-footer{padding:26px 18px;border-top:0;background:var(--bg-deep);margin-top:36px}
