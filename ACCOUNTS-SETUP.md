@@ -223,6 +223,22 @@ shipped or refunded yet, enter a tracking number (carrier is optional) and
 tap **"Mark shipped"** — this saves the tracking info and sends the
 shipping email in one step.
 
+The ship form also has a **"Photographed before boxing"** checkbox —
+tick it if you took a dispatch photo of that card, which is now stated as
+practice on the Shipping & Returns page. It's recorded per order (shown
+as "📷 Dispatch photo recorded" or a "⚠ No dispatch photo recorded"
+warning in the dashboard) so you have a record to point to if a buyer
+ever disputes an item's condition on arrival — it doesn't store the photo
+itself, just that one was taken, so keep the actual photos wherever you
+already keep them.
+
+**If your D1 database already existed before this feature was added**, run
+this once in the D1 Console tab:
+
+```sql
+ALTER TABLE orders ADD COLUMN dispatch_photo_taken INTEGER NOT NULL DEFAULT 0;
+```
+
 ## Reviewing return requests
 
 There's no admin page for this yet — a buyer's return request just creates
