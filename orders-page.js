@@ -82,6 +82,11 @@
           ? `Shipped ${order.shipped_at} — ${order.carrier} ${order.tracking_number}`
           : `Shipped ${order.shipped_at} — tracking ${order.tracking_number}`;
         row.appendChild(info);
+
+        const photoInfo = document.createElement("p");
+        photoInfo.className = order.dispatch_photo_taken ? "order-tracking-info" : "order-tracking-info order-photo-missing";
+        photoInfo.textContent = order.dispatch_photo_taken ? "📷 Dispatch photo recorded" : "⚠ No dispatch photo recorded";
+        row.appendChild(photoInfo);
       } else if (order.status !== "refunded" && order.status !== "partially_refunded") {
         const form = document.createElement("form");
         form.className = "ship-form";
@@ -95,6 +100,13 @@
         trackingInput.placeholder = "Tracking number";
         trackingInput.required = true;
 
+        const photoLabel = document.createElement("label");
+        photoLabel.className = "ship-form-photo-check";
+        const photoCheckbox = document.createElement("input");
+        photoCheckbox.type = "checkbox";
+        photoLabel.appendChild(photoCheckbox);
+        photoLabel.appendChild(document.createTextNode("Photographed before boxing"));
+
         const submitBtn = document.createElement("button");
         submitBtn.type = "submit";
         submitBtn.className = "btn-outline";
@@ -106,6 +118,7 @@
 
         form.appendChild(carrierInput);
         form.appendChild(trackingInput);
+        form.appendChild(photoLabel);
         form.appendChild(submitBtn);
         form.appendChild(note);
 
@@ -125,6 +138,7 @@
                 order_id: order.id,
                 tracking_number: trackingNumber,
                 carrier: carrierInput.value.trim(),
+                dispatch_photo_taken: photoCheckbox.checked,
               }),
             });
             if (!res.ok) throw new Error("request failed");
