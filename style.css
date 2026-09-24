@@ -526,7 +526,6 @@ body.drawer-open{overflow:hidden}
 .footer-links a:hover{color:var(--gold)}
 .footer-shop{flex-basis:100%}
 .footer-shop .footer-links{gap:10px 16px}
-.footer-trader{flex-basis:100%;margin:0;text-transform:none;letter-spacing:.04em;line-height:1.6}
 
 /* SEO landing sections: home "shop by" links, category pages, card details, set guide */
 .browse-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;margin-top:8px}
