@@ -272,7 +272,7 @@ def main():
     lines += ["", "## Notes", ""]
     empty_alts = sorted(set(info))
     lines.append(f"- {len(empty_alts)} images use an empty alt because they're decorative (category thumbnails, logos next to the shop name).")
-    lines.append(f"- Set list last reviewed {reviewed.isoformat()} ({age} days ago).")
+    lines.append(f"- Set list last reviewed {reviewed.isoformat()}. The audit warns once this is over 60 days old.")
     report = "\n".join(lines) + "\n"
     os.makedirs(os.path.join(ROOT, "seo"), exist_ok=True)
     path = os.path.join(ROOT, "seo", "audit-report.md")
