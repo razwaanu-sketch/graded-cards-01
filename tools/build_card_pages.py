@@ -214,6 +214,12 @@ def card_page(template, p, i, image_rel, registry, pages):
                 "@type": "OfferShippingDetails",
                 "shippingRate": {"@type": "MonetaryAmount", "value": SHIPPING_GBP, "currency": "GBP"},
                 "shippingDestination": {"@type": "DefinedRegion", "addressCountry": "GB"},
+                # Dispatch in 1-2 business days, then Royal Mail Special Delivery Guaranteed (next working day).
+                "deliveryTime": {
+                    "@type": "ShippingDeliveryTime",
+                    "handlingTime": {"@type": "QuantitativeValue", "minValue": 1, "maxValue": 2, "unitCode": "DAY"},
+                    "transitTime": {"@type": "QuantitativeValue", "minValue": 1, "maxValue": 1, "unitCode": "DAY"},
+                },
             },
             "hasMerchantReturnPolicy": {
                 "@type": "MerchantReturnPolicy",
@@ -532,8 +538,10 @@ def write_merchant_feed(products, infos, registry):
       <g:product_type>{esc(product_type)}</g:product_type>
       <g:shipping>
         <g:country>GB</g:country>
-        <g:service>Tracked, signed-for</g:service>
+        <g:service>Royal Mail Special Delivery Guaranteed</g:service>
         <g:price>{SHIPPING_GBP} GBP</g:price>
+        <g:min_transit_time>1</g:min_transit_time>
+        <g:max_transit_time>1</g:max_transit_time>
       </g:shipping>
       <g:min_handling_time>1</g:min_handling_time>
       <g:max_handling_time>2</g:max_handling_time>
