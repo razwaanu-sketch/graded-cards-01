@@ -1,0 +1,1 @@
+Installed from https://github.com/huzaifaa-dev-vibe/Ultimate-Ui-Ux-pro-max-2.O at commit a60b554 (MIT). Omitted: .github/, docs/, examples/, repo admin files.
