@@ -9,6 +9,7 @@ here rather than filled in by JavaScript. For each run this writes:
                             unique SEO title and description, "About this card"
                             copy, breadcrumbs, internal links and Product data
   images/share/<id>.jpg     a 1200x630 link-preview image per card
+  images/thumbs/<photo>     600px-wide copies of each card photo for grids
   <category>.html           landing pages (PSA graded, PSA 10, Japanese, eras,
                             Pokémon...) for every category with enough stock,
                             configured in seo/categories.json
@@ -26,6 +27,7 @@ then check the result with:
 The "Card share pages" GitHub Action runs both on every relevant push to main.
 Needs node (to read products.js) and Pillow.
 """
+import hashlib
 import json
 import os
 import re
@@ -53,7 +55,11 @@ STATIC_PAGES = ["", "about.html", "faq.html", "shipping.html", "contact.html",
                 "terms.html", "privacy.html", "notify.html"]
 
 SHARE_DIR = os.path.join(ROOT, "images", "share")
+THUMB_DIR = os.path.join(ROOT, "images", "thumbs")
+THUMB_W = 600
 W, H = 1200, 630
+# Card page photo: the 600px thumbnail on narrow or low-density screens, the 900px photo otherwise.
+PDP_SIZES = "(min-width: 780px) 420px, calc(100vw - 36px)"
 
 
 def load_products():
@@ -109,6 +115,51 @@ def share_image(p):
     os.makedirs(SHARE_DIR, exist_ok=True)
     bg.save(os.path.join(SHARE_DIR, f"{p['id']}.jpg"), "JPEG", quality=84, optimize=True, progressive=True)
     return f"images/share/{p['id']}.jpg"
+
+
+def thumbnails():
+    """600x960 copies of every card photo for grids, the hero and the cart.
+
+    Tiles show a card at roughly 170-300px wide, so the 900px photos (about
+    500 KB each) were several times bigger than needed. Built from the
+    full-resolution photo when there is one. A thumbnail is only rebuilt when
+    its source photo changes (tracked by hash in sources.json), so reruns
+    don't churn files.
+    """
+    src_dir = os.path.join(ROOT, "images", "cards")
+    full_dir = os.path.join(ROOT, "images", "cards-full")
+    os.makedirs(THUMB_DIR, exist_ok=True)
+    manifest_path = os.path.join(THUMB_DIR, "sources.json")
+    old = json.load(open(manifest_path)) if os.path.exists(manifest_path) else {}
+    new = {}
+    for name in sorted(os.listdir(src_dir)):
+        if not name.endswith(".jpg"):
+            continue
+        stem = name[:-4]
+        src = os.path.join(full_dir, name)
+        if not os.path.exists(src):
+            src = os.path.join(src_dir, name)
+        with open(src, "rb") as f:
+            digest = hashlib.sha1(f.read()).hexdigest()
+        new[stem] = digest
+        outs = [os.path.join(THUMB_DIR, stem + ext) for ext in (".webp", ".jpg")]
+        if old.get(stem) == digest and all(os.path.exists(o) for o in outs):
+            continue
+        im = Image.open(src).convert("RGB")
+        im = im.resize((THUMB_W, round(THUMB_W * im.height / im.width)), Image.LANCZOS)
+        im.save(outs[0], "WEBP", quality=72, method=6)
+        im.save(outs[1], "JPEG", quality=76, optimize=True, progressive=True)
+    for name in os.listdir(THUMB_DIR):
+        stem, ext = os.path.splitext(name)
+        if ext in (".webp", ".jpg") and stem not in new:
+            os.remove(os.path.join(THUMB_DIR, name))
+    write(os.path.relpath(manifest_path, ROOT), json.dumps(new, indent=1, sort_keys=True) + "\n")
+
+
+def thumb(path, ext=None):
+    """images/cards/x.jpg -> images/thumbs/x.jpg (or .webp)."""
+    out = path.replace("images/cards/", "images/thumbs/", 1)
+    return out.rsplit(".", 1)[0] + ext if ext else out
 
 
 # ---------------------------------------------------------------- head helpers
@@ -251,7 +302,8 @@ def card_page(template, p, i, image_rel, registry, pages):
          f'<p class="pdp-breadcrumb" id="pdp-breadcrumb">{crumb_html}</p>'),
         ('<section class="pdp container" id="pdp-loaded" hidden>', '<section class="pdp container" id="pdp-loaded">'),
         ("        <!-- picture, grade badge, and zoom button injected by product.js -->",
-         f'        <picture><source srcset="{esc(webp)}" type="image/webp"><img src="{esc(p["image"])}" alt="{esc(alt)}" width="900" height="1440"></picture>\n'
+         f'        <picture><source srcset="{esc(thumb(p["image"], ".webp"))} 600w, {esc(webp)} 900w" sizes="{PDP_SIZES}" type="image/webp">'
+         f'<img src="{esc(p["image"])}" srcset="{esc(thumb(p["image"]))} 600w, {esc(p["image"])} 900w" sizes="{PDP_SIZES}" alt="{esc(alt)}" width="900" height="1440" fetchpriority="high"></picture>\n'
          f'        <span class="grade-badge">{esc(p["grade"])} {esc(p["gradeLabel"])}</span>'),
         ('<h1 class="pdp-title" id="pdp-product-title"></h1>', f'<h1 class="pdp-title" id="pdp-product-title">{esc(p["name"])}</h1>'),
         ('<p class="pdp-meta" id="pdp-product-meta"></p>', f'<p class="pdp-meta" id="pdp-product-meta">{esc(p["set"])} · #{esc(p["cardNumber"])}</p>'),
@@ -287,14 +339,13 @@ def shell_parts():
 def card_tile(p, i):
     href = f"card-{p['id']}.html"
     alt = f"{p['name']} {p['grade']} {p['gradeLabel']} graded Pokémon card, {p['set']} #{p['cardNumber']}"
-    webp = p["image"].rsplit(".", 1)[0] + ".webp"
-    sold_badge = '\n            <span class="sold-badge">Sold</span>' if p.get("sold") else ""
+    sold_badge ='\n            <span class="sold-badge">Sold</span>' if p.get("sold") else ""
     action = ('<span class="btn-outline btn-disabled btn-block">Sold out</span>' if p.get("sold")
               else f'<a class="btn-gold btn-block" href="{href}">View card</a>')
     return f"""        <article class="product-card" role="listitem">
           <div class="product-media">
             <a class="product-media-link" href="{href}">
-              <picture><source srcset="{esc(webp)}" type="image/webp"><img src="{esc(p['image'])}" alt="{esc(alt)}" loading="lazy" width="900" height="1440"></picture>
+              <picture><source srcset="{esc(thumb(p['image'], '.webp'))}" type="image/webp"><img src="{esc(thumb(p['image']))}" alt="{esc(alt)}" loading="lazy" width="600" height="960"></picture>
             </a>{sold_badge}
           </div>
           <div class="product-body">
@@ -562,6 +613,7 @@ def main():
     for p in unmatched:
         print(f"WARNING: '{p['id']}' set '{p['set']}' is not in seo/sets.json. Add the set (or an alias) so it gets an era.")
 
+    thumbnails()
     pages = L.build_categories(products, infos, registry)
     template = read("product.html")
     ids = []

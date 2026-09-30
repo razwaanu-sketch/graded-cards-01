@@ -13,6 +13,7 @@ on:
       - about.html
       - index.html
       - images/cards/**
+      - images/cards-full/**
       - images/logo-mark.png
       - seo/sets.json
       - seo/categories.json
@@ -52,7 +53,7 @@ jobs:
       - name: Commit changes
         id: commit
         run: |
-          git add -A -- '*.html' card-pages.js images/share sitemap.xml google-merchant-feed.xml seo/audit-report.md
+          git add -A -- '*.html' card-pages.js images/share images/thumbs sitemap.xml google-merchant-feed.xml seo/audit-report.md
           if git diff --cached --quiet; then
             echo "No generated changes."
             echo "changed=false" >> "$GITHUB_OUTPUT"

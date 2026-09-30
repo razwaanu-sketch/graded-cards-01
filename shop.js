@@ -71,6 +71,12 @@
     container.appendChild(btn);
   }
 
+  // Grid-sized (600px) copy of a card photo, built by tools/build_card_pages.py.
+  function thumbSrc(src, ext) {
+    const out = src.replace("images/cards/", "images/thumbs/");
+    return ext ? out.replace(/\.jpg$/, ext) : out;
+  }
+
   function renderCard(product) {
     const card = document.createElement("article");
     card.className = "product-card";
@@ -84,8 +90,8 @@
     // the fact causes some browsers to fetch both the source and the img src.
     media.innerHTML = `<a class="product-media-link" href="${productUrl(product.id)}" aria-label="View ${product.name} details">
       <picture>
-        <source srcset="${product.image.replace(/\.jpg$/, ".webp")}" type="image/webp">
-        <img src="${product.image}" alt="${product.name} ${product.grade} ${product.gradeLabel} graded Pokémon card, ${product.set} #${product.cardNumber}" loading="lazy">
+        <source srcset="${thumbSrc(product.image, ".webp")}" type="image/webp">
+        <img src="${thumbSrc(product.image)}" width="600" height="960" alt="${product.name} ${product.grade} ${product.gradeLabel} graded Pokémon card, ${product.set} #${product.cardNumber}" loading="lazy">
       </picture>
     </a>`;
     const img = media.querySelector("img");
@@ -197,7 +203,7 @@
       btn.setAttribute("data-tag", cat.tag);
       btn.innerHTML = `
         <span class="category-tile-num">${String(i + 1).padStart(2, "0")}</span>
-        <span class="category-tile-thumb"><picture><source srcset="${cat.image.replace(/\.jpg$/, ".webp")}" type="image/webp"><img src="${cat.image}" alt="" loading="lazy"></picture></span>
+        <span class="category-tile-thumb"><picture><source srcset="${thumbSrc(cat.image, ".webp")}" type="image/webp"><img src="${thumbSrc(cat.image)}" alt="" loading="lazy"></picture></span>
         <span class="category-tile-text">
           <span class="category-tile-label">${cat.label}</span>
           <span class="category-tile-sub">${cat.sub}</span>

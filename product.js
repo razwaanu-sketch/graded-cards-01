@@ -7,6 +7,13 @@
   const id = window.GC01_PRODUCT_ID || params.get("id");
   const product = typeof PRODUCTS !== "undefined" ? PRODUCTS.find((p) => p.id === id) : null;
   const productUrl = (pid) => (window.gc01ProductUrl ? window.gc01ProductUrl(pid) : `product.html?id=${pid}`);
+  // Grid-sized (600px) copy of a card photo, built by tools/build_card_pages.py.
+  const thumbSrc = (src, ext) => {
+    const out = src.replace("images/cards/", "images/thumbs/");
+    return ext ? out.replace(/\.jpg$/, ext) : out;
+  };
+  // Main photo: the 600px copy on narrow or low-density screens, the 900px photo otherwise.
+  const PDP_SIZES = "(min-width: 780px) 420px, calc(100vw - 36px)";
 
   // Old product.html?id= links move to the card's own page, so the address
   // people copy and share is the one with a proper link preview.
@@ -109,7 +116,7 @@
 
     const thumb = document.getElementById("pdp-sticky-thumb");
     if (thumb) {
-      thumb.src = p.image;
+      thumb.src = thumbSrc(p.image, ".webp");
       thumb.alt = imageAlt(p);
     }
     const name = document.getElementById("pdp-sticky-name");
@@ -163,8 +170,8 @@
     media.className = "product-media";
     media.innerHTML = `<a class="product-media-link" href="${productUrl(p.id)}" aria-label="View ${p.name} details">
       <picture>
-        <source srcset="${p.image.replace(/\.jpg$/, ".webp")}" type="image/webp">
-        <img src="${p.image}" alt="${imageAlt(p)}" loading="lazy">
+        <source srcset="${thumbSrc(p.image, ".webp")}" type="image/webp">
+        <img src="${thumbSrc(p.image)}" width="600" height="960" alt="${imageAlt(p)}" loading="lazy">
       </picture>
     </a>`;
     const img = media.querySelector("img");
@@ -268,8 +275,8 @@
 
     const media = document.getElementById("pdp-media");
     media.innerHTML = `<picture>
-      <source srcset="${product.image.replace(/\.jpg$/, ".webp")}" type="image/webp">
-      <img src="${product.image}" alt="${imageAlt(product)}" decoding="async">
+      <source srcset="${thumbSrc(product.image, ".webp")} 600w, ${product.image.replace(/\.jpg$/, ".webp")} 900w" sizes="${PDP_SIZES}" type="image/webp">
+      <img src="${product.image}" srcset="${thumbSrc(product.image)} 600w, ${product.image} 900w" sizes="${PDP_SIZES}" alt="${imageAlt(product)}" decoding="async">
     </picture>`;
     const img = media.querySelector("img");
     img.addEventListener("error", () => {
