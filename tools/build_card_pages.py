@@ -295,13 +295,12 @@ def card_tile(p, i):
           <div class="product-media">
             <a class="product-media-link" href="{href}">
               <picture><source srcset="{esc(webp)}" type="image/webp"><img src="{esc(p['image'])}" alt="{esc(alt)}" loading="lazy" width="900" height="1440"></picture>
-            </a>
-            <span class="grade-badge">{esc(p['grade'])} {esc(p['gradeLabel'])}</span>{sold_badge}
+            </a>{sold_badge}
           </div>
           <div class="product-body">
+            <p class="product-grade">{esc(p['grade'])} {esc(p['gradeLabel'])}</p>
             <h3 class="product-title"><a class="product-title-link" href="{href}">{esc(p['name'])}</a></h3>
             <p class="product-meta">{esc(p['set'])} · #{esc(p['cardNumber'])}</p>
-            <p class="product-cert">{esc(i['company'])} cert #{esc(p['certNumber'])}</p>
             <div class="product-footer"><span class="price">{esc(L.price_text(p))}</span></div>
             {action}
           </div>

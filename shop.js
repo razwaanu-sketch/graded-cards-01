@@ -93,11 +93,6 @@
       img.src = "images/cards/placeholder.svg";
     });
 
-    const gradeBadge = document.createElement("span");
-    gradeBadge.className = "grade-badge";
-    gradeBadge.textContent = `${product.grade} ${product.gradeLabel}`;
-    media.appendChild(gradeBadge);
-
     if (product.sold) {
       const soldBadge = document.createElement("span");
       soldBadge.className = "sold-badge";
@@ -107,6 +102,10 @@
 
     const body = document.createElement("div");
     body.className = "product-body";
+
+    const grade = document.createElement("p");
+    grade.className = "product-grade";
+    grade.textContent = `${product.grade} ${product.gradeLabel}`;
 
     const title = document.createElement("h3");
     title.className = "product-title";
@@ -120,11 +119,6 @@
     meta.className = "product-meta";
     meta.textContent = `${product.set} · #${product.cardNumber}`;
 
-    const cert = document.createElement("p");
-    cert.className = "product-cert";
-    const gradingCompany = product.grade.split(" ")[0];
-    cert.textContent = `${gradingCompany} cert #${product.certNumber}`;
-
     const footer = document.createElement("div");
     footer.className = "product-footer";
 
@@ -133,9 +127,9 @@
     price.textContent = formatPrice(product.price, product.currency);
     footer.appendChild(price);
 
+    body.appendChild(grade);
     body.appendChild(title);
     body.appendChild(meta);
-    body.appendChild(cert);
     body.appendChild(footer);
     renderCartAction(body, product);
 
